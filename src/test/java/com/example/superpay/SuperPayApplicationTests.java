@@ -35,6 +35,7 @@ class SuperPayApplicationTests {
             user.setSecretKey("dasd");
 //            user.setId(mongoAutoidUtil.getNextSequence("user"));
             mongoTemplate.save(user);
+//            userRepository.save()
         }
 
         Iterable<User> articles = userRepository.findAll();
