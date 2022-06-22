@@ -6,13 +6,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import lombok.*;
 
+import java.util.UUID;
+
 @ToString(includeFieldNames = true)
 @Setter
 @Getter
 @Document(collection = "user")
 public class User {
     @Id
-    private long id;
+    private String id;
     @Field("username")
     private String username;
     @Field("password")
@@ -35,6 +37,15 @@ public class User {
     private Long  addTime;
     @Field("updateTime")
     private Long updateTime;
+
+    public User() {
+        UUID uuid = UUID.randomUUID();
+        id = uuid.toString().replaceAll("-","");
+    }
+    @Override
+    public String toString() {
+        return JSONObject.toJSONString(this);
+    }
 
     public static Object getInstance(String user) {
         if (user != null){

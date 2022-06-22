@@ -33,7 +33,7 @@ class SuperPayApplicationTests {
             user.setRate(1);
             user.setState(1);
             user.setSecretKey("dasd");
-            user.setId(mongoAutoidUtil.getNextSequence("user"));
+//            user.setId(mongoAutoidUtil.getNextSequence("user"));
             mongoTemplate.save(user);
         }
 
