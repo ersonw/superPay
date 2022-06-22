@@ -1,5 +1,6 @@
 package com.example.superpay.control;
 
+import com.example.superpay.util.ToolsUtil;
 import io.swagger.annotations.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,17 +8,18 @@ import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(value = "/", tags = "根接口")
-@ApiResponses({
-        @ApiResponse(code = 200, message = "成功"),
-        @ApiResponse(code = 105, message = "未带token请求"),
-        @ApiResponse(code = 106, message = "token非法或者登录已过期"),
-})
-
 @Controller
+//@RestController
 public class IndexControl{
-    @RequestMapping(value = "/",produces = "text/html")
+    @GetMapping(value = "/")
     public String index(){
+//        System.out.printf(getClassPath());
         return "index";
+    }
+    public String getClassPath(){
+        return getClassPath("/");
+    }
+    public String getClassPath(String path){
+        return this.getClass().getClassLoader().getResource(path).getPath();
     }
 }

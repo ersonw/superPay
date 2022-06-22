@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.UUID;
 
-@Api(value = "/api/user", tags = "根接口")
+@Api(value = "/api/user", tags = "用户接口")
 @ApiResponses({
         @ApiResponse(code = 200, message = "成功"),
         @ApiResponse(code = 105, message = "未带token请求"),

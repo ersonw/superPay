@@ -1,8 +1,6 @@
 spring:
-  mvc:
-    view:
-      suffix: .html
-      prefix: /
+  thymeleaf:
+    prefix: /static/
   data:
     mongodb:
       username: super_pay

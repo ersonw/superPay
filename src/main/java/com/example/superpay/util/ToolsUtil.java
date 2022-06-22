@@ -48,7 +48,6 @@ public class ToolsUtil {
     public static void rest(){
     }
 
-
     public static long cardinality(long max){
         return cardinality(100,max);
     }
