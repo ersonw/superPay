@@ -1,1 +1,10 @@
-
+spring:
+  mvc:
+    view:
+      suffix: .html
+      prefix: /
+  data:
+    mongodb:
+      username: super_pay
+      password: 6d2880f9f562108b
+      uri: mongodb://127.0.0.1:27017/super_pay
