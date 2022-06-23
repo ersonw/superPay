@@ -1,4 +1,9 @@
+server:
+  port: 8000
 spring:
+  web:
+    resources:
+      static-locations: /static/
   thymeleaf:
     prefix: /static/
   data:

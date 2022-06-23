@@ -2,6 +2,7 @@ package com.example.superpay.data;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.superpay.entity.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -51,13 +52,17 @@ public  class pData  {
     private String imagePath;
 
     @ApiModelProperty(hidden = true)
+//    @JsonProperty(value = "IP")
     private String ip;
-    @ApiModelProperty(hidden = true)
-    private boolean isWeb;
     @ApiModelProperty(hidden = true)
     private String user;
     public User getUser() {
         JSONObject jsonObject = JSONObject.parseObject(user);
         return JSONObject.toJavaObject(jsonObject, User.class);
+    }
+
+    @Override
+    public String toString() {
+        return JSONObject.toJSONString(this);
     }
 }

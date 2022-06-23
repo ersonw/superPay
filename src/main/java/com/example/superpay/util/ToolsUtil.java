@@ -47,7 +47,29 @@ public class ToolsUtil {
     }
     public static void rest(){
     }
-
+    private static boolean isNotRes(String str){
+        List<String> parts = new ArrayList<>();
+        parts.add(".js");
+        parts.add(".css");
+        parts.add(".html");
+        parts.add(".txt");
+        parts.add("jpg");
+        parts.add(".png");
+        parts.add(".gif");
+        parts.add(".svg");
+        parts.add(".ico");
+        parts.add(".jpeg");
+        parts.add(".woff2");
+        parts.add(".map");
+        for (String s: parts) {
+            if(str.endsWith(s)){
+                return true;
+            }
+        }
+//        System.out.printf(str);
+//        System.out.printf("\n");
+        return false;
+    }
     public static long cardinality(long max){
         return cardinality(100,max);
     }
@@ -81,7 +103,13 @@ public class ToolsUtil {
     }
     public static  String getToken(){
         UUID uuid = UUID.randomUUID();
-        return uuid.toString().replaceAll("-","")+System.currentTimeMillis();
+        String uid = uuid.toString();
+        String[] uids = uid.split("-");
+        StringBuilder sb = new StringBuilder();
+        for(String s: uids){
+            sb.append(s).append(getRandom(3));
+        }
+        return sb.toString();
     }
     public static String getRandom(int n){
         return RandomStringUtils.randomAlphanumeric(n);

@@ -1,7 +1,9 @@
 package com.example.superpay.entity;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.superpay.util.ToolsUtil;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import lombok.*;
@@ -28,19 +30,20 @@ public class User {
     @Field("notifyUrl")
     private String notifyUrl;
     @Field("rate")
-    private Integer rate;
+    private Integer rate = 100;
     @Field("fee")
-    private Integer fee;
+    private Integer fee = 0;
     @Field("state")
-    private Integer state;
+    private Integer state = 0;
     @Field("addTime")
     private Long  addTime;
     @Field("updateTime")
     private Long updateTime;
+    @Transient
+    private String token;
 
     public User() {
-        UUID uuid = UUID.randomUUID();
-        id = uuid.toString().replaceAll("-","");
+        id = ToolsUtil.getToken();
     }
     @Override
     public String toString() {

@@ -12,7 +12,8 @@ import java.util.List;
 public interface UserRepository extends PagingAndSortingRepository<User, String> {
     //分页查询
     public Page<User> findAll(Pageable pageable);
-
+    public User findAllById(String id);
+    public User findAllByUsername(String username);
 //
 //    //根据author查询
 //    public List<User> findByAuthor(String author);
