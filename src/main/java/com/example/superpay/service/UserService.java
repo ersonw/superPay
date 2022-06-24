@@ -7,12 +7,10 @@ import com.example.superpay.entity.User;
 import com.example.superpay.repository.LoginRepository;
 import com.example.superpay.repository.UserRepository;
 import com.example.superpay.util.MD5Util;
-import com.example.superpay.util.MongoAutoidUtil;
 import com.example.superpay.util.ToolsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 @Slf4j

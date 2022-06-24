@@ -19,6 +19,10 @@ public class ResponseData {
 //        if (data != null) return AESUtils.Encrypt(data);
 //        return null;
 //    }
+    public JSONObject getData(){
+        if (data != null) return (JSONObject) JSONObject.parse(data);
+        return null;
+    }
     @Override
     public String toString() {
         return JSONObject.toJSONString(this);
