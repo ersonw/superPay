@@ -44,15 +44,21 @@ public class UserControl {
     @PostMapping("/login")
     @ApiGlobalModel(component = pData.class, value = "username,password")
     public ResponseData login(@RequestBody pData data){
-//        System.out.printf(data.toString());
-//        System.out.printf("\n");
-//        return ResponseData.success(data.getIp());
         if (StringUtils.isEmpty(data.getUsername()) || StringUtils.isEmpty(data.getPassword())){
             return ResponseData.error("用户名或密码必填!");
         }
         return service.login(data.getUsername(),data.getPassword(), data.getIp());
     }
-
+    @GetMapping("/info")
+    public ResponseData info(@RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
+                             @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
+        return service.info(User.getUser(user),ip);
+    }
+    @GetMapping("/logout")
+    public ResponseData logout(@RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
+                             @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
+        return service.logout(User.getUser(user),ip);
+    }
     @GetMapping("/test")
 //    @ApiGlobalModel(component = pData.class, value = "toId,id,text,seek")
     public ResponseData test(
@@ -60,20 +66,7 @@ public class UserControl {
                                       @RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user
 //            @RequestParam(value = "ip") @ApiParam(hidden = true) String ip
     ) {
-//        User user = new User();
-//        user.setAddTime(System.currentTimeMillis());
-//        user.setFee(1);
-//        user.setCallbackUrl("https://pay.telebott.com//api/adapter/epayOrder");
-//        user.setNotifyUrl("https://pay.telebott.com//api/adapter/epayOrder");
-//        user.setPassword("3gOVsdBIgJdDSvOVhd8IlNgSMv43yfEk");
-//        user.setUsername("admin");
-//        user.setSalt("HpDl52vZDIgoGH3NFZW8Xs5WZKRe3R6v");
-//        user.setSecretKey(user.getPassword());
-//        mongoTemplate.save(user);
-//        System.out.printf(user.getId());
-//        9MjfGvQ0mhXS4JFjAl2owcGdUpXAh3He
-//        MD5Util md5Util = new MD5Util(user.getSalt());
-//        System.out.printf(md5Util.getPassWord(md5Util.getMD5(user.getPassword())));
+        service.test();
         return ResponseData.success(user);
     }
 }

@@ -17,10 +17,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.alibaba.fastjson.JSONObject;
-//import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 
-import org.apache.tomcat.util.codec.binary.Base64;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
@@ -39,16 +38,13 @@ public class AESUtils {
 
     // 加密
     public static String Encrypt(String sSrc){
-        return Encrypt(sSrc,encodeRules);
-    }
-    public static String Encrypt(String sSrc,String sKey){
         try {
             //1.构造密钥生成器，指定为AES算法,不区分大小写
             KeyGenerator keygen = KeyGenerator.getInstance("AES");
             //2.根据ecnodeRules规则初始化密钥生成器
             //生成一个128位的随机源,根据传入的字节数组
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            random.setSeed(sKey.getBytes());
+            random.setSeed(encodeRules.getBytes());
             keygen.init(128, random);
             //3.产生原始对称密钥
             SecretKey original_key = keygen.generateKey();
@@ -71,21 +67,13 @@ public class AESUtils {
 
     // 解密
     public static String Decrypt(String sSrc) {
-        String sKey = null;
-        if (sSrc.contains("#")) {
-            sKey = sSrc.substring(0, sSrc.indexOf("#"));
-            sSrc = sSrc.substring(sSrc.indexOf("#")+1);
-        }
-        return Decrypt(sSrc,sKey);
-    }
-    public static String Decrypt(String sSrc, String sKey) {
         try {
             byte[] raw;
             // 判断Key是否正确
-            if (StringUtils.isNotEmpty(sSrc)) {
-//                String sKey = sSrc.substring(0, sSrc.indexOf("#"));
-//                sSrc = sSrc.substring(sSrc.indexOf("#")+1);
-////                System.out.println(sSrc);
+            if (sSrc.contains("#")) {
+                String sKey = sSrc.substring(0, sSrc.indexOf("#"));
+                sSrc = sSrc.substring(sSrc.indexOf("#")+1);
+//                System.out.println(sSrc);
                 raw = sKey.getBytes(StandardCharsets.UTF_8);
             }else{
                 //1.构造密钥生成器，指定为AES算法,不区分大小写

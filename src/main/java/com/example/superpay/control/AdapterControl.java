@@ -2,9 +2,7 @@ package com.example.superpay.control;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.superpay.config.ApiGlobalModel;
-import com.example.superpay.data.EPayData;
-import com.example.superpay.data.ResponseData;
-import com.example.superpay.data.pData;
+import com.example.superpay.data.*;
 import com.example.superpay.service.AdapterService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiResponse;
@@ -13,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-@Api(value = "/api/adapter", tags = "下单网关")
+@Api(value = "/v3api", tags = "下单网关")
 @RestController
-@RequestMapping("/api/adapter")
+//@RequestMapping("/api/adapter")
 public class AdapterControl {
     @Autowired
     private AdapterService service;
@@ -25,13 +23,15 @@ public class AdapterControl {
 //    public ResponseData epayOrder(@RequestBody EPayData epay){
 //        return ResponseData.success();
 //    }
-    @PostMapping("/epayOrder")
-    public ResponseData ePayOrder(@ModelAttribute EPayData ePay){
-//        System.out.printf(epay.toString()+"\n");
-        return service.ePayOrder(ePay);
+
+    @ApiIgnore
+    @PostMapping("/v3api/notify")
+    public String sNotify(@ModelAttribute ToPayNotify toPayNotify){
+        return service.sNotify(toPayNotify);
     }
-    @GetMapping("/epayOrder")
-    public String ePayOrder(@ModelAttribute JSONObject json){
-        return "ok";
+    @GetMapping("/v3api/ePayNotify")
+    public String ePayNotify(@ModelAttribute EPayNotify ePayNotify){
+        return service.ePayNotify(ePayNotify);
     }
+
 }

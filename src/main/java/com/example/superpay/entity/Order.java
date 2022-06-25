@@ -20,27 +20,31 @@ public class Order {
     @Field("orderId")
     private String orderId;
     @Field("trade_no")
-    private String trade_no;
+    private String tradeNo;
     @Field("out_trade_no")
-    private String out_trade_no;
-    @Field("type_id")
-    private String type_id;
+    private String outTradeNo;
+    @Field("third_party_id")
+    private String thirdPartyId;
     @Field("ip")
     private String ip;
     @Field("return_url")
-    private String return_url;
+    private String returnUrl;
     @Field("notify_url")
-    private String notify_url;
+    private String notifyUrl;
     @Field("name")
     private String name;
     @Field("money")
     private String money;
-    @Field("trade_status")
-    private String trade_status;
+    @Field("total_fee")
+    private String totalFee;
+    @Field("notify_state")
+    private int notifyState;
+    @Field("state")
+    private long state =0;
     @Field("add_time")
-    private long add_time;
+    private long addTime;
     @Field("update_time")
-    private long update_time;
+    private long updateTime;
     public Order() {
         this.id = ToolsUtil.getToken();
     }

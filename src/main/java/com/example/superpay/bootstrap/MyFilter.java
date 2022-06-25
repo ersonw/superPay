@@ -22,7 +22,7 @@ import java.util.Map;
 
 //@Order(10000)
 //@Component
-@WebFilter(filterName = "myFilter", urlPatterns ="/api/*")
+@WebFilter(filterName = "myFilter", urlPatterns = {"/api/*", "/v3api/*"})
 public class MyFilter implements Filter {
 //    private static MyFilter self;
 //    @Autowired
@@ -119,6 +119,7 @@ public class MyFilter implements Filter {
                         String postContent = ToolsUtil.getJsonBodyString(request);
 //                        System.out.println(postContent);
                         String s =  AESUtils.Decrypt(postContent);
+//                        System.out.printf(s);
                         if (s != null){
                             postContent = s;
                         }

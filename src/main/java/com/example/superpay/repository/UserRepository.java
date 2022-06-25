@@ -13,6 +13,7 @@ public interface UserRepository extends PagingAndSortingRepository<User, String>
     //分页查询
     public Page<User> findAll(Pageable pageable);
     public User findAllById(String id);
+    public User findAllByPid(Long id);
     public User findAllByUsername(String username);
 //
 //    //根据author查询

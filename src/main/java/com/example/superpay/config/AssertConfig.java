@@ -15,8 +15,9 @@ public class AssertConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 //        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/").addResourceLocations( "classpath:/META-INF/resources/static/");
-        registry.addResourceHandler("/**").addResourceLocations( "static/");
-//        registry.addResourceHandler("/upload/**").addResourceLocations( "static/upload/");
+        registry.addResourceHandler("/admin/**").addResourceLocations( "static/");
+        registry.addResourceHandler("/upload/**").addResourceLocations( "static/upload/");
+        registry.addResourceHandler("index.html").addResourceLocations( "/");
         //从这里开始，是我加的swagger的静态资源
         registry.addResourceHandler("swagger-ui.html")
                 .addResourceLocations("classpath:/META-INF/resources/");

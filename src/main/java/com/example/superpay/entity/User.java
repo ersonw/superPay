@@ -17,6 +17,8 @@ import java.util.UUID;
 public class User {
     @Id
     private String id;
+    @Field("pid")
+    private long pid;
     @Field("username")
     private String username;
     @Field("password")
@@ -50,7 +52,7 @@ public class User {
         return JSONObject.toJSONString(this);
     }
 
-    public static Object getInstance(String user) {
+    public static User getUser(String user) {
         if (user != null){
             return JSONObject.toJavaObject(JSONObject.parseObject(user),User.class);
         }

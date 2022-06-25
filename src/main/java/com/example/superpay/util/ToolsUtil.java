@@ -1,7 +1,6 @@
 package com.example.superpay.util;
 
 
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -13,9 +12,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.PostConstruct;
 import javax.crypto.BadPaddingException;
@@ -46,6 +45,21 @@ public class ToolsUtil {
         rest();
     }
     public static void rest(){
+    }
+    public static ModelAndView errorHtml(String msg){
+        ModelAndView error = new ModelAndView("payHtml/error");
+        error.addObject("msg",msg);
+        return error;
+    }
+    public static ModelAndView postHtml(String url){
+        ModelAndView post = new ModelAndView("payHtml/post");
+        post.addObject("url",url);
+        return post;
+    }
+    public static ModelAndView waitHtml(){
+        ModelAndView post = new ModelAndView("payHtml/wait");
+//        post.addObject("url",url);
+        return post;
     }
     private static boolean isNotRes(String str){
         List<String> parts = new ArrayList<>();

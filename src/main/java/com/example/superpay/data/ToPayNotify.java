@@ -1,5 +1,6 @@
 package com.example.superpay.data;
 
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,4 +22,9 @@ public class ToPayNotify {
     private String sign;
     @ApiModelProperty(hidden = true)
     private String ip;
+
+    @Override
+    public String toString(){
+        return JSONObject.toJSONString(this);
+    }
 }

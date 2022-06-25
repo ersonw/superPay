@@ -15,14 +15,14 @@ public class ResponseData {
     private  int code = 200;
     private  String message;
     private  String data;
-//    public String getData(){
-//        if (data != null) return AESUtils.Encrypt(data);
-//        return null;
-//    }
-    public JSONObject getData(){
-        if (data != null) return (JSONObject) JSONObject.parse(data);
+    public String getData(){
+        if (data != null) return AESUtils.Encrypt(data);
         return null;
     }
+//    public JSONObject getData(){
+//        if (data != null) return (JSONObject) JSONObject.parse(data);
+//        return null;
+//    }
     @Override
     public String toString() {
         return JSONObject.toJSONString(this);

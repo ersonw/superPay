@@ -5,7 +5,9 @@ spring:
     resources:
       static-locations: /static/
   thymeleaf:
-    prefix: /static/
+#    prefix: /static/
+    prefix: /
+    cache: false
   data:
     mongodb:
 #      username: super_pay

@@ -11,4 +11,5 @@ public interface OrderRepository  extends PagingAndSortingRepository<Order, Stri
     //分页查询
     public Page<Order> findAll(Pageable pageable);
     public Order findAllById(String id);
+    public Order findAllByOutTradeNo(String out_trade_no);
 }
