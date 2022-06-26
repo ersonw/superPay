@@ -35,7 +35,7 @@ public class CallbackControl {
     @ApiIgnore
     @GetMapping("/v3api/callback")
 //    public ModelAndView sCallback(@ModelAttribute JSONObject jsonObject){
-    public ModelAndView sCallback(@RequestParam(value = "out_trade_no") String out_trade_no,
+    public ModelAndView sCallback(@RequestParam(value = "outTradeNo") String out_trade_no,
                                   @RequestParam(value = "ip") String ip){
 //        System.out.printf(jsonObject.toJSONString());
         return service.sCallback(out_trade_no,ip);

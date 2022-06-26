@@ -24,6 +24,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -45,6 +46,10 @@ public class ToolsUtil {
         rest();
     }
     public static void rest(){
+    }
+    public static Double getMoney(double d){
+        BigDecimal bigDecimal = new BigDecimal(d);
+        return bigDecimal.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
     }
     public static ModelAndView errorHtml(String msg){
         ModelAndView error = new ModelAndView("payHtml/error");

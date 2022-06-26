@@ -55,6 +55,9 @@ public class UserService {
         JSONObject object = ResponseData.object("username", u.getUsername());
         object.put("token", u.getToken());
         object.put("id", u.getId());
+        object.put("avatar", u.getAvatar());
+        object.put("callbackUrl", u.getCallbackUrl());
+        object.put("notifyUrl", u.getNotifyUrl());
         return ResponseData.success(object);
     }
 

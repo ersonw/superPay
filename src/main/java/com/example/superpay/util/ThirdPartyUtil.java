@@ -18,17 +18,17 @@ public class ThirdPartyUtil {
             String secretKey = showPay.getSecretKey();//商户秘钥
             String money = String.valueOf(order.getMoney());
 //            //金额换算成分单位
-            BigDecimal rate = new BigDecimal(100);
-            Integer total_fee = new BigDecimal(money).multiply(rate).intValue();
+//            BigDecimal rate = new BigDecimal(100);
+//            Integer total_fee = new BigDecimal(money).multiply(rate).intValue();
 //            System.out.println(total_fee);
 //            String out_trade_no = UUID.randomUUID().toString().replace("-", "");
 
             Map<String, String> data = new HashMap<>();
             data.put("mchid", mchid);//商户号
-            data.put("total_fee", String.valueOf(total_fee));//金额单位分
-//            data.put("total_fee", String.valueOf(order.getMoney()));//金额单位分
+//            data.put("total_fee", String.valueOf(total_fee));//金额单位分
+            data.put("total_fee", String.valueOf(order.getMoney() * 100));//金额单位分
             data.put("out_trade_no", order.getOutTradeNo());//用户自定义订单号
-            data.put("callback_url", showPay.getCallbackUrl()+"?out_trade_no="+order.getOutTradeNo());//支付成功同步跳转地址
+            data.put("callback_url", showPay.getCallbackUrl()+"?outTradeNo="+order.getOutTradeNo());//支付成功同步跳转地址
             data.put("notify_url", showPay.getNotifyUrl());//支付成功异步通知地址
             data.put("error_url", showPay.getErrorUrl());//支付失败或者取消同步跳转地址
 

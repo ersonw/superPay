@@ -102,6 +102,31 @@ public class TimeUtil {
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTimeInMillis();
     }
+    public static long getMinutes(int minute){
+        return getMinuteZero() + (minute * 60 * 1000L);
+    }
+    public static long getSecondZero(int minute){
+        Calendar calendar = Calendar.getInstance();
+//        calendar.set(Calendar.SECOND, second);
+        if(minute > 0) calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
+    public static long getMinuteZero(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.SECOND, 0);
+//        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
+    public static long getHourZero(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
+//        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
     public static long getMonthZero(){
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_MONTH, 1);

@@ -2,10 +2,7 @@ package com.example.superpay.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.superpay.data.*;
-import com.example.superpay.entity.Order;
-import com.example.superpay.entity.PayType;
-import com.example.superpay.entity.ThirdParty;
-import com.example.superpay.entity.User;
+import com.example.superpay.entity.*;
 import com.example.superpay.repository.OrderRepository;
 import com.example.superpay.repository.PayTypeRepository;
 import com.example.superpay.repository.ThirdPartyRepository;
@@ -19,9 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +28,8 @@ import java.util.List;
 @Service
 public class AdapterService {
     private static int PAY_TYPE_INDEX = 0;
+    @Autowired
+    private MongoTemplate mongoTemplate;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -80,8 +81,7 @@ public class AdapterService {
         }else {
             return ToolsUtil.errorHtml("异步通知地址不可为空！");
         }
-
-        order.setMoney(ePay.getMoney());
+        order.setMoney(new BigDecimal(ePay.getMoney()).doubleValue());
         order.setName(ePay.getName());
         order.setAddTime(System.currentTimeMillis());
         order.setUpdateTime(System.currentTimeMillis());
@@ -159,7 +159,7 @@ public class AdapterService {
     }
 
     public ModelAndView sCallback(String out_trade_no, String ip) {
-        System.out.printf("test out_trade_no:"+out_trade_no + "\n ip:"+ip);
+        System.out.printf("test out_trade_no:"+out_trade_no + " ip:"+ip+"\n");
         Order order = orderRepository.findAllByOutTradeNo(out_trade_no);
         if(order == null){
             return ToolsUtil.errorHtml("订单号不存在!");
@@ -176,7 +176,7 @@ public class AdapterService {
             url = order.getReturnUrl();
         }
         EPayNotify notify = getEPayNotify(order,user);
-//        System.out.printf(notify+"\n");
+//        System.out.printf(url+"\n");
         return ToolsUtil.postHtml(url+"?"+ EPayNotify.getParameter(notify));
     }
 
@@ -186,11 +186,16 @@ public class AdapterService {
         if (partys.isEmpty()){
             return "error";
         }
-        if(!ThirdPartyUtil.toPayVerify(toPayNotify, partys.get(0))){
+        ThirdParty party = partys.get(0);
+        if(!ThirdPartyUtil.toPayVerify(toPayNotify, party)){
             return "error";
         }
         Order order = orderRepository.findAllByOutTradeNo(toPayNotify.getOut_trade_no());
         if(order == null){
+            return "error";
+        }
+        User user = userRepository.findAllById(order.getUid());
+        if(user == null){
             return "error";
         }
         if(order.getState() == 1){
@@ -199,8 +204,78 @@ public class AdapterService {
         order.setState(1);
         order.setNotifyState(0);
         order.setTradeNo(toPayNotify.getTrade_no());
-        order.setTotalFee(toPayNotify.getTotal_fee());
+        order.setTotalFee(new BigDecimal(toPayNotify.getTotal_fee()).doubleValue());
+        double fee = 0D;
+        Fee f = new Fee();
+        f.setAddTime(System.currentTimeMillis());
+        f.setUid(user.getId());
+        f.setOrderId(order.getId());
+        f.setTip("支付成功！第三方通道扣手续费");
+        /**
+         * 扣除通道费
+         */
+        if(party.getRate() > 0){
+            Double rate = party.getRate();
+            Double rateFee = 0D;
+            if(rate > 1){
+                if(rate < 100){
+                    rateFee = ToolsUtil.getMoney(order.getTotalFee() * (rate / 100));
+                }else {
+                    rateFee = order.getTotalFee();
+                }
+            }else{
+                rateFee = ToolsUtil.getMoney(order.getTotalFee() * rate);
+            }
+            fee = ToolsUtil.getMoney(rateFee);
+            f.setPartyFee(rateFee);
+        }
+        /**
+         * 扣除自定义费率
+         */
+        if(user.getRate() > 0){
+            Double rate = user.getRate();
+            Double rateFee = 0D;
+            Double totalFee = order.getTotalFee() - fee;
+            if(rate > 1){
+                if(rate < 100){
+                    rateFee = ToolsUtil.getMoney(order.getTotalFee() * (rate / 100));
+                    if(rateFee > totalFee) {
+                        rateFee = totalFee;
+                    }
+                }else {
+                    rateFee = order.getTotalFee();
+                    if(rateFee > totalFee) {
+                        rateFee = totalFee;
+                    }
+                }
+            }else{
+                rateFee = ToolsUtil.getMoney(order.getTotalFee() * rate);
+                if(rateFee > totalFee) {
+                    rateFee = totalFee;
+                }
+            }
+            fee = fee + ToolsUtil.getMoney(rateFee);
+            f.setRateFee(ToolsUtil.getMoney(rateFee));
+        }
+        /**
+         * 扣除单笔手续费
+         */
+        if(user.getFee() > 0){
+            Double totalFee = order.getTotalFee() - fee;
+            Double rateFee = 0D;
+            if(user.getFee() > totalFee){
+                rateFee = totalFee;
+            }else {
+                rateFee = user.getFee();
+            }
+            fee = fee + ToolsUtil.getMoney(rateFee);
+            f.setSelfFee(ToolsUtil.getMoney(rateFee));
+        }
+        order.setFee(fee);
         orderRepository.save(order);
+        if(f.isNotEmpty()){
+            mongoTemplate.save(f);
+        }
         handlerThirdPartyNotify(order);
         return "success";
     }
@@ -221,7 +296,7 @@ public class AdapterService {
         notify.setTrade_no(order.getTradeNo());
         notify.setOut_trade_no(order.getOutTradeNo());
         notify.setType(getPayType(order.getThirdPartyId()));
-        notify.setMoney(order.getTotalFee());
+        notify.setMoney(String.valueOf(order.getTotalFee()));
         notify.setTrade_status("TRADE_SUCCESS");
         if(StringUtils.isNotEmpty(order.getName())){
             notify.setName(order.getName());
@@ -248,7 +323,7 @@ public class AdapterService {
         if(ePayNotify.getPid() == 0) return "error";
         User user = userRepository.findAllByPid(ePayNotify.getPid());
         boolean verify = ePayNotify.isSign(user.getSecretKey());
-        System.out.printf(verify ? "效验成功！": "效验失败!");
+        System.out.printf(verify ? "效验成功！\n": "效验失败!\n");
         if(verify){
             return "success";
         }

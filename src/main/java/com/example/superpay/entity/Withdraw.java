@@ -11,27 +11,23 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @ToString(includeFieldNames = true)
 @Setter
 @Getter
-@Document(collection = "order")
-public class Order {
+@Document(collection = "withdraw")
+public class Withdraw {
+    public Withdraw(){
+        this.id = ToolsUtil.getToken();
+    }
     @Id
     private String id;
+    @Field("uid")
     private String uid;
-    private String orderId;
-    private String tradeNo;
-    private String outTradeNo;
-    private String thirdPartyId;
-    private String ip;
-    private String returnUrl;
-    private String notifyUrl;
-    private String name;
+    private String typeId;
     private Double money;
     private Double totalFee;
     private Double fee;
-    private int notifyState;
-    private long state =0;
+    private String name;
+    private String account;
+    private String remark;
+    private int state = 0;
     private long addTime;
     private long updateTime;
-    public Order() {
-        this.id = ToolsUtil.getToken();
-    }
 }

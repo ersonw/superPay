@@ -21,6 +21,8 @@ public class User {
     private long pid;
     @Field("username")
     private String username;
+    @Field("avatar")
+    private String avatar;
     @Field("password")
     private String password;
     @Field("salt")
@@ -32,9 +34,9 @@ public class User {
     @Field("notifyUrl")
     private String notifyUrl;
     @Field("rate")
-    private Integer rate = 100;
+    private Double rate = 0D;
     @Field("fee")
-    private Integer fee = 0;
+    private Double fee = 0D;
     @Field("state")
     private Integer state = 0;
     @Field("addTime")
