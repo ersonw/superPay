@@ -6,7 +6,7 @@ spring:
       static-locations: /static/
   thymeleaf:
 #    prefix: /static/
-    prefix: /
+    prefix: classpath:/
     cache: false
   data:
     mongodb:
