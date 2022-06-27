@@ -24,13 +24,13 @@ public class Order {
     private String returnUrl;
     private String notifyUrl;
     private String name;
-    private Double money;
-    private Double totalFee;
-    private Double fee;
-    private int notifyState;
+    private Double money=0D;
+    private Double totalFee=0D;
+    private Double fee=0D;
+    private int notifyState=0;
     private long state =0;
-    private long addTime;
-    private long updateTime;
+    private long addTime=0L;
+    private long updateTime=0L;
     public Order() {
         this.id = ToolsUtil.getToken();
     }

@@ -12,25 +12,10 @@ import org.springframework.stereotype.Repository;
 public interface OrderRepository  extends PagingAndSortingRepository<Order, String>, CrudRepository<Order, String> {
     //分页查询
     public Page<Order> findAll(Pageable pageable);
+    public Page<Order> findAllByUid(String uid,Pageable pageable);
+    //精确查询
     public Order findAllById(String id);
     public Order findAllByOutTradeNo(String out_trade_no);
-
-    /**
-     * 统计数量
-     */
-    public Page<Order> findAllByAddTimeGreaterThanEqual(long time, Pageable pageable);
-    public Page<Order> findAllByAddTimeGreaterThanEqualAndAddTimeLessThanEqual(long time, Pageable pageable);
-
-    public Page<Order> findAllByAddTimeGreaterThanEqualAndUid(long time, String uid, Pageable pageable);
-    public Page<Order> findAllByAddTimeGreaterThanEqualAndAddTimeLessThanEqualAndUid(long gte, long lte, String uid, Pageable pageable);
-
-    public Long countAllByAddTimeGreaterThanEqual(long time);
-    public Long countAllByAddTimeGreaterThanEqualAndAddTimeLessThanEqual(long gte, long lte);
-
-    public Long countAllByAddTimeGreaterThanEqualAndUid(long time, String uid);
-    public Long countAllByAddTimeGreaterThanEqualAndAddTimeLessThanEqualAndUid(long gte, long lte, String uid);
-
-
-//    @Query(value = "{ add_time: {$gte: ?0} }")
-//    public Page<Order> getAllByTime(long time, Pageable pageable);
+    //统计查询
+    public Long findAllByUid(String uid);
 }

@@ -153,10 +153,7 @@ public class AdapterService {
         if(order.getState() == 0){
             return ToolsUtil.waitHtml();
         }
-        String url = user.getCallbackUrl();
-        if(StringUtils.isNotEmpty(order.getReturnUrl())){
-            url = order.getReturnUrl();
-        }
+        String url = order.getReturnUrl();
         EPayNotify notify = getEPayNotify(order,user);
         try {
             URL u = new URL(url);
@@ -194,6 +191,7 @@ public class AdapterService {
         if(order.getState() == 1){
             return "success";
         }
+        order.setUpdateTime(System.currentTimeMillis());
         order.setState(1);
         order.setNotifyState(0);
         order.setTradeNo(toPayNotify.getTrade_no());
@@ -203,7 +201,7 @@ public class AdapterService {
         f.setAddTime(System.currentTimeMillis());
         f.setUid(user.getId());
         f.setOrderId(order.getId());
-        f.setTip("支付成功！第三方通道扣手续费");
+        f.setTip("第三方通道手续费");
         /**
          * 扣除通道费
          */
@@ -282,15 +280,15 @@ public class AdapterService {
         }
         return "unknown";
     }
-    private EPayNotify getEPayNotify(Order order,User user){
+    public EPayNotify getEPayNotify(Order order,User user){
 
         EPayNotify notify = new EPayNotify();
         notify.setPid(user.getPid());
         notify.setTrade_no(order.getTradeNo());
         notify.setOut_trade_no(order.getOutTradeNo());
         notify.setType(getPayType(order.getThirdPartyId()));
-        notify.setMoney(String.valueOf(order.getTotalFee()));
-        notify.setTrade_status("TRADE_SUCCESS");
+        notify.setMoney(String.valueOf(order.getMoney()));
+        notify.setTrade_status(order.getState() == 1?"TRADE_SUCCESS":"TRADE_FAILED");
         if(StringUtils.isNotEmpty(order.getName())){
             notify.setName(order.getName());
         }
@@ -301,10 +299,7 @@ public class AdapterService {
     private void handlerThirdPartyNotify(Order order) {
         User user = userRepository.findAllById(order.getUid());
         if(user == null) return;
-        String url = user.getNotifyUrl();
-        if(StringUtils.isNotEmpty(order.getNotifyUrl())){
-            url = order.getNotifyUrl();
-        }
+        String url = order.getNotifyUrl();
         EPayNotify notify = getEPayNotify(order,user);
         if(ToolsUtil.request(url, EPayNotify.getParameter(notify)).equals("success")){
             order.setNotifyState(1);
@@ -313,6 +308,7 @@ public class AdapterService {
     }
 
     public String ePayNotify(EPayNotify ePayNotify) {
+        System.out.printf("%s\n",ePayNotify);
         if(ePayNotify.getPid() == 0) return "error";
         User user = userRepository.findAllByPid(ePayNotify.getPid());
         boolean verify = ePayNotify.isSign(user.getSecretKey());

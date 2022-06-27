@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
+
 @Data
 @ApiModel
 public  class pData  {
@@ -50,6 +52,9 @@ public  class pData  {
     private String filePath;
     @ApiModelProperty(name = "imagePath", value= "图片路径",required = false)
     private String imagePath;
+
+    @ApiModelProperty(name = "selected", value= "批量选择",required = false)
+    private List<String> selected;
 
     @ApiModelProperty(hidden = true)
     private String ip;

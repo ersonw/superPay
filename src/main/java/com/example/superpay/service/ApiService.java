@@ -5,23 +5,32 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.superpay.dao.AdminDao;
 import com.example.superpay.dao.OrderDao;
 import com.example.superpay.dao.WithDrawDao;
+import com.example.superpay.data.EPayNotify;
 import com.example.superpay.data.ResponseData;
 import com.example.superpay.entity.Order;
+import com.example.superpay.entity.PayType;
+import com.example.superpay.entity.ThirdParty;
 import com.example.superpay.entity.User;
 import com.example.superpay.repository.*;
 import com.example.superpay.util.JSONUtil;
 import com.example.superpay.util.TimeUtil;
+import com.example.superpay.util.ToolsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
 public class ApiService {
+    @Autowired
+    private AdapterService adapterService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -30,6 +39,8 @@ public class ApiService {
     private PayTypeRepository payTypeRepository;
     @Autowired
     private OrderDao orderDao;
+    @Autowired
+    private OrderRepository orderRepository;
     @Autowired
     private WithDrawDao withDrawDao;
     @Autowired
@@ -229,5 +240,98 @@ public class ApiService {
         sb.append("/v3api/Polymer");
         object.put("兼容易支付网关地址",sb.toString());
         return ResponseData.success(JSONUtil.getSortJson(object));
+    }
+    private JSONObject getOrder(Order order){
+        return getOrder(order,false);
+    }
+    private JSONObject getOrder(Order order, boolean admin){
+        JSONObject object = ResponseData.object("ID", order.getId());
+        if (admin){
+            User user = userRepository.findAllById(order.getUid());
+            object.put("商户","");
+            if (user != null){
+                object.put("商户",user.getUsername());
+            }
+        }
+        object.put("商户订单号",order.getOutTradeNo());
+        object.put("交易流水订单号",order.getTradeNo());
+//        object.put("三方渠道","");
+        object.put("支付方式","");
+        ThirdParty party = thirdPartyRepository.findAllById(order.getThirdPartyId());
+        if (party != null){
+//            object.put("三方渠道",party.getTitle());
+            PayType type = payTypeRepository.findAllById(party.getTypeId());
+            if (type != null){
+                object.put("支付方式",type.getName());
+            }
+        }
+        object.put("订单金额",order.getMoney()+"元");
+        object.put("实付金额",order.getTotalFee()+"元");
+        object.put("手续费",order.getFee()+"元");
+
+        object.put("订单通知状态",order.getNotifyState() == 1?"已通知":"未通知");
+        object.put("订单交易状态",order.getState() == 1?"成功":"失败");
+
+//        object.put("更新时间",TimeUtil.getDateTime(order.getUpdateTime()));
+        object.put("下订单时间",TimeUtil.getDateTime(order.getAddTime()));
+        return object;
+    }
+    private JSONArray getOrders(List<Order> orders){
+        JSONArray array = new JSONArray();
+        for (Order order: orders) {
+            if(order != null){
+                array.add(getOrder(order));
+            }
+        }
+        return array;
+    }
+    public ResponseData orders(int page, User user, String ip) {
+        if (user == null) return ResponseData.error();
+        page--;
+        if (page < 0) page=0;
+        Pageable pageable = PageRequest.of(page,30, Sort.by(Sort.Direction.DESC,"addTime"));
+        Page<Order> orderPage = orderRepository.findAllByUid(user.getId(),pageable);
+        JSONObject object = ResponseData.object("total", orderPage.getTotalPages());
+        object.put("list", getOrders(orderPage.getContent()));
+        return ResponseData.success(object);
+    }
+
+    public ResponseData orderNotify(List<String> selected, User user, String ip) {
+//        System.out.printf(selected.toString()+"\n");
+        if (user == null) return ResponseData.error();
+        if(!user.isAdmin()) return ResponseData.error("需要管理权限!");
+        List<Order> orders = orderDao.getOrders(selected);
+        if (orders == null) return ResponseData.error();
+        for (Order order: orders) {
+            User u = userRepository.findAllById(order.getUid());
+            if (u != null){
+                EPayNotify notify = adapterService.getEPayNotify(order,u);
+                String url = order.getNotifyUrl();
+                String result = ToolsUtil.request(url, EPayNotify.getParameter(notify));
+//                System.out.printf("result:%s\n",result);
+                if("success".equals(result)){
+                    order.setNotifyState(1);
+                    orderRepository.save(order);
+                }
+            }
+        }
+        return ResponseData.success(ResponseData.object("state",true));
+    }
+
+    public ResponseData orderDelete(List<String> selected, User user, String ip) {
+        if (user == null) return ResponseData.error();
+        if(!user.isAdmin()) return ResponseData.error("需要管理权限!");
+        orderRepository.deleteAllById(selected);
+        return ResponseData.success(ResponseData.object("state",true));
+    }
+
+    public ResponseData orderNo(int page, String orderNo, User user, String ip) {
+        page--;
+        if (page < 0) page = 0;
+        Pageable pageable = PageRequest.of(page,30,Sort.by(Sort.Direction.DESC,"addTime"));
+        Page<Order> orderPage = orderDao.getOrders(orderNo,pageable);
+        JSONObject object = ResponseData.object("total", orderPage.getTotalPages());
+        object.put("list", getOrders(orderPage.getContent()));
+        return ResponseData.success(object);
     }
 }

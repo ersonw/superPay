@@ -41,7 +41,7 @@ public class EPayNotify {
         object = JSONUtil.getSortJson(object);
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, Object> entry: object.entrySet()) {
-            if (entry.getValue() != null){
+            if (entry.getValue() != null&& !entry.getKey().equals("sign")&& !entry.getKey().equals("sign_type")){
                 sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
             }
         }
