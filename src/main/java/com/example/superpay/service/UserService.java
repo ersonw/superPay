@@ -1,6 +1,7 @@
 package com.example.superpay.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.superpay.dao.AdminDao;
 import com.example.superpay.dao.AuthDao;
 import com.example.superpay.data.ResponseData;
 import com.example.superpay.entity.Login;
@@ -23,15 +24,15 @@ public class UserService {
     private LoginRepository loginRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AdminDao adminDao;
 
     public ResponseData login(String username, String password, String ip) {
         log.error("ip address:{}, username:{}, password:{}", ip, username,password);
         User user = userRepository.findAllByUsername(username);
         if(user == null ) return  ResponseData.error("user not found");
+        if(!adminDao.isIpAddress(user.getId(), ip)) return  ResponseData.error("IP 地址不在白名单内！");
         if(user.getState() == -1) return  ResponseData.error("用户状态异常，请联系管理员");
-//        System.out.printf(getPassword(password,user.getSalt()));
-//        user.setPassword("bc2c48951bd283c8324231fb8a8406b5");
-//        userRepository.save(user);
         if(!verifyPassword(user.getPassword(),password,user.getSalt())) return ResponseData.error("password is Blank!");
         user.setToken(ToolsUtil.getToken());
         authDao.pushUser(user);
@@ -49,12 +50,15 @@ public class UserService {
     public ResponseData info(User user, String ip) {
         if (user == null) return ResponseData.error("user not found!");
         User u = userRepository.findAllById(user.getId());
-        if (u == null || u.getState() == -1) return ResponseData.error("user not found!");
+        if (u == null) return ResponseData.error("user not found!");
+        if(!adminDao.isIpAddress(u.getId(), ip)) return  ResponseData.error("IP 地址不在白名单内！");
+        if( u.getState() != 0) return ResponseData.error("用户状态异常，请联系管理员!");
         u.setToken(user.getToken());
         authDao.pushUser(u);
         JSONObject object = ResponseData.object("username", u.getUsername());
         object.put("token", u.getToken());
         object.put("id", u.getId());
+        object.put("admin", u.isAdmin());
         object.put("avatar", u.getAvatar());
         object.put("callbackUrl", u.getCallbackUrl());
         object.put("notifyUrl", u.getNotifyUrl());
@@ -64,7 +68,7 @@ public class UserService {
     public ResponseData logout(User user, String ip) {
         if (user == null) return ResponseData.error();
         log.error("logout user name:{} ip:{}",user.getUsername(),ip);
-        authDao.removeUser(user);
+        if(adminDao.isIpAddress(user.getId(), ip)) authDao.removeUser(user);
         return ResponseData.success("注销登录成功！");
     }
 

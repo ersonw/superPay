@@ -23,10 +23,12 @@ public class CallbackControl {
     public ModelAndView ePayOrder(@ModelAttribute EPayData ePay){
         return service.ePayOrder(ePay);
     }
+
     @GetMapping("/v3api/test")
-    public ModelAndView test(@ModelAttribute EPayData ePay){
+    public ModelAndView test(){
         return service.ePayOrder(service.test());
     }
+    @ApiIgnore
     @GetMapping("/v3api/ePayReturn")
     public ModelAndView ePayReturn(@ModelAttribute EPayNotify ePayNotify){
 //        System.out.printf(ePayNotify+"\n");

@@ -21,6 +21,15 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 public class OrderDao {
     @Autowired
     private MongoTemplate mongoTemplate;
+    public Double getOrderAdminSum(long start, long end){
+        AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
+                match(Criteria.where("state").is(1))
+                ,match(Criteria.where("addTime").gte(start).lte(end))
+                ,group().sum("money").as("sum")
+        ), "order", JSONObject.class);
+        if(results.getMappedResults().isEmpty()) return 0D;
+        return results.getMappedResults().get(0).getDouble("sum");
+    }
     public Double getOrderSum(String uid,long start, long end){
         AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
                 match(Criteria.where("uid").is(uid))
@@ -57,9 +66,24 @@ public class OrderDao {
         if(results.getMappedResults().isEmpty()) return 0D;
         return results.getMappedResults().get(0).getDouble("sum");
     }
+    public long getOrderAdminCount(long start,long end){
+        AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
+                match(Criteria.where("addTime").gte(start).lte(end))
+                ,group().count().as("count")), "order", JSONObject.class);
+        if(results.getMappedResults().isEmpty()) return 0;
+        return results.getMappedResults().get(0).getLong("count");
+    }
     public long getOrderCount(String uid, long start,long end){
         AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
                 match(Criteria.where("uid").is(uid))
+                ,match(Criteria.where("addTime").gte(start).lte(end))
+                ,group().count().as("count")), "order", JSONObject.class);
+        if(results.getMappedResults().isEmpty()) return 0;
+        return results.getMappedResults().get(0).getLong("count");
+    }
+    public long getOrderCount(long start,long end, int state){
+        AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
+                match(Criteria.where("state").is(state))
                 ,match(Criteria.where("addTime").gte(start).lte(end))
                 ,group().count().as("count")), "order", JSONObject.class);
         if(results.getMappedResults().isEmpty()) return 0;
@@ -89,6 +113,19 @@ public class OrderDao {
         if(results.getMappedResults().isEmpty()) return 0;
         return results.getMappedResults().get(0).getLong("count");
     }
+    public long getOrderCount(){
+        AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
+                group().count().as("count")), "order", JSONObject.class);
+        if(results.getMappedResults().isEmpty()) return 0;
+        return results.getMappedResults().get(0).getLong("count");
+    }
+    public long getOrderCount(int state){
+        AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
+                match(Criteria.where("state").is(state))
+                ,group().count().as("count")), "order", JSONObject.class);
+        if(results.getMappedResults().isEmpty()) return 0;
+        return results.getMappedResults().get(0).getLong("count");
+    }
     public long getOrderCount(String uid){
         AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
                 match(Criteria.where("uid").is(uid))
@@ -101,6 +138,14 @@ public class OrderDao {
         AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
                 match(Criteria.where("uid").is(uid))
                 ,match(Criteria.where("state").is(1))
+                ,group().sum("totalFee").as("sum").sum("fee").as("fee")
+        ), "order", JSONObject.class);
+        if(results.getMappedResults().isEmpty()) return 0D;
+        return results.getMappedResults().get(0).getDouble("sum") - results.getMappedResults().get(0).getDouble("fee");
+    }
+    public Double getAllMoney(){
+        AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
+                match(Criteria.where("state").is(1))
                 ,group().sum("totalFee").as("sum").sum("fee").as("fee")
         ), "order", JSONObject.class);
         if(results.getMappedResults().isEmpty()) return 0D;

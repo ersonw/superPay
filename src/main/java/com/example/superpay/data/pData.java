@@ -52,8 +52,15 @@ public  class pData  {
     private String imagePath;
 
     @ApiModelProperty(hidden = true)
-//    @JsonProperty(value = "IP")
     private String ip;
+    @ApiModelProperty(hidden = true)
+    private String serverName;
+    @ApiModelProperty(hidden = true)
+    private int serverPort;
+    @ApiModelProperty(hidden = true)
+    private String uri;
+    @ApiModelProperty(hidden = true)
+    private String url;
     @ApiModelProperty(hidden = true)
     private String user;
     public User getUser() {

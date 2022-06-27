@@ -28,4 +28,17 @@ public class WithDrawDao {
         if(results.getMappedResults().isEmpty()) return 0D;
         return results.getMappedResults().get(0).getDouble("sum");
     }
+    public Double getWithDrawSum(){
+        AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
+                group().sum("money").as("sum")), "withdraw", JSONObject.class);
+        if(results.getMappedResults().isEmpty()) return 0D;
+        return results.getMappedResults().get(0).getDouble("sum");
+    }
+    public Double getWithDrawSum(int state){
+        AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
+                match(Criteria.where("state").is(state))
+                ,group().sum("money").as("sum")), "withdraw", JSONObject.class);
+        if(results.getMappedResults().isEmpty()) return 0D;
+        return results.getMappedResults().get(0).getDouble("sum");
+    }
 }

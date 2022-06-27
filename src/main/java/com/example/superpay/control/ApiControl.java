@@ -28,4 +28,13 @@ public class ApiControl {
                                   @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
         return service.dayData(User.getUser(user),ip);
     }
+    @GetMapping("/merchantDetails")
+    public ResponseData merchantDetails(@RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
+                                  @RequestParam(value = "ip") @ApiParam(hidden = true) String ip,
+                                  @RequestParam(value = "url",required = false) @ApiParam(hidden = true) String url,
+                                  @RequestParam(value = "serverName",required = false) @ApiParam(hidden = true) String serverName,
+                                  @RequestParam(value = "serverPort",defaultValue = "80") @ApiParam(hidden = true) int serverPort
+                                        ){
+        return service.merchantDetails(User.getUser(user),ip,serverName,serverPort,url);
+    }
 }

@@ -96,6 +96,12 @@ public class MyFilter implements Filter {
             String token = ((HttpServletRequest) req).getHeader("Token");
             String ip = getIpAddr(request);
 //            System.out.printf(ip+"\n");
+            String serverName = request.getServerName();//返回服务器的主机名
+            String serverPort = String.valueOf(request.getServerPort());//返回服务器的端口号
+            String uri = request.getRequestURI();//返回请求行中的资源名称
+            String url = request.getRequestURL().toString();//获得客户端发送请求的完整url
+//            System.out.printf("ServerName:%s ServerPort:%d uri:%s URL:%s\n",serverName,serverPort,uri,url);
+
             User user = null;
             if (StringUtils.isNotEmpty(token)){
                 if (token.equals("04b4b58apiVb84b9Zp4f6cxXxb25b33S69700d6e85e92UJ")) {
@@ -109,6 +115,10 @@ public class MyFilter implements Filter {
                 Map<String, String[]> parameterMap = new HashMap(request.getParameterMap());
                 ParameterRequestWrapper wrapper = new ParameterRequestWrapper(request, parameterMap);
                 wrapper.addParameter("ip", ip);
+                wrapper.addParameter("serverName", serverName);
+                wrapper.addParameter("serverPort", String.valueOf(serverPort));
+                wrapper.addParameter("uri", uri);
+                wrapper.addParameter("url", url);
                 if (user != null){
                     wrapper.addParameter("user", JSONObject.toJSONString(user));
                 }
@@ -129,6 +139,10 @@ public class MyFilter implements Filter {
                             jsStr = JSONObject.parseObject(postContent);
                         }
                         jsStr.put("ip", ip);
+                        jsStr.put("serverName", serverName);
+                        jsStr.put("serverPort", serverPort);
+                        jsStr.put("uri", uri);
+                        jsStr.put("url", url);
                         if (user != null) {
                             jsStr.put("user", JSONObject.toJSONString(user));
                         }
@@ -141,6 +155,10 @@ public class MyFilter implements Filter {
                     }else{
                         Map<String, String[]> parameterMap = new HashMap(request.getParameterMap());
                         parameterMap.put("ip", new String[]{ip});
+                        parameterMap.put("serverName", new String[]{serverName});
+                        parameterMap.put("serverPort", new String[]{String.valueOf(serverPort)});
+                        parameterMap.put("uri", new String[]{uri});
+                        parameterMap.put("url", new String[]{url});
                         if (user != null) {
                             parameterMap.put("user", new String[]{JSONObject.toJSONString(user)});
                         }

@@ -42,7 +42,8 @@ public class User {
     @Field("addTime")
     private Long  addTime;
     @Field("updateTime")
-    private Long updateTime;
+    private Long updateTime = 0L;
+    private boolean admin =false;
     @Transient
     private String token;
 

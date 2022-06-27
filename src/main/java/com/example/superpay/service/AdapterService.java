@@ -10,6 +10,7 @@ import com.example.superpay.repository.UserRepository;
 import com.example.superpay.util.ThirdPartyUtil;
 import com.example.superpay.util.TimeUtil;
 import com.example.superpay.util.ToolsUtil;
+import com.example.superpay.util.UrlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +49,9 @@ public class AdapterService {
         User user = userRepository.findAllByPid(ePay.getPid());
         if (user == null) {
             return ToolsUtil.errorHtml("商户ID不存在!");
+        }
+        if(user.getState() != 0){
+            return ToolsUtil.errorHtml("商户存在异常，请联系管理员!");
         }
         if(!ePay.isSign(user.getSecretKey())){
             return ToolsUtil.errorHtml("数据效验失败!");
@@ -128,30 +134,6 @@ public class AdapterService {
         data.setMoney("1.00");
         data.setSign(data.getSign("3gOVsdBIgJdDSvOVhd8IlNgSMv43yfEk"));
         return data;
-//        System.out.printf(data.getSign("3gOVsdBIgJdDSvOVhd8IlNgSMv43yfEk")+"\n");
-//        System.out.printf( data.getOut_trade_no()+"\n");
-
-//        PayType payType = new PayType();
-//        payType.setType("WechatPay");
-//        payType.setName("微信支付");
-//        payType.setAddTime(System.currentTimeMillis());
-//        payType.setUpdateTime(System.currentTimeMillis());
-////        payTypeRepository.save(payType);
-//
-//        ThirdParty thirdParty = new ThirdParty();
-//        thirdParty.setDomain("http://121.199.22.139:8211/toPay");
-//        thirdParty.setMchId("2c9180838153974501815f66c8540bb8");
-//        thirdParty.setSecretKey("eeae24639e4146479ca075fdb46a13cf");
-//        thirdParty.setTitle("自三方");
-//        thirdParty.setTypeId(payType.getId());
-//        thirdParty.setCallbackUrl("https://pay.telebott.com/v3api/callback");
-//        thirdParty.setNotifyUrl("https://pay.telebott.com/v3api/error");
-//        thirdParty.setErrorUrl("https://pay.telebott.com/v3api/notify");
-//        thirdParty.setState(1);
-//        thirdParty.setAddTime(System.currentTimeMillis());
-//        thirdParty.setUpdateTime(System.currentTimeMillis());
-////        thirdPartyRepository.save(thirdParty);
-
     }
 
     public ModelAndView sError() {
@@ -176,8 +158,19 @@ public class AdapterService {
             url = order.getReturnUrl();
         }
         EPayNotify notify = getEPayNotify(order,user);
-//        System.out.printf(url+"\n");
-        return ToolsUtil.postHtml(url+"?"+ EPayNotify.getParameter(notify));
+        try {
+            URL u = new URL(url);
+            if(StringUtils.isNotEmpty(u.getQuery())){
+                url = url + "&";
+            }else {
+                url= url+"?";
+            }
+            return ToolsUtil.postHtml(url+ EPayNotify.getParameter(notify));
+        } catch (MalformedURLException e) {
+//            throw new RuntimeException(e);
+            e.printStackTrace();
+        }
+        return ToolsUtil.errorHtml("商户回调地址错误!");
     }
 
     public String sNotify(ToPayNotify toPayNotify) {

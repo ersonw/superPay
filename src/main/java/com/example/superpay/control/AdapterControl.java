@@ -17,18 +17,12 @@ import springfox.documentation.annotations.ApiIgnore;
 public class AdapterControl {
     @Autowired
     private AdapterService service;
-//    @ApiIgnore
-//    @PostMapping("/epayOrder")
-//    @ApiGlobalModel(component = EPayData.class, value = "toId,id,text,seek")
-//    public ResponseData epayOrder(@RequestBody EPayData epay){
-//        return ResponseData.success();
-//    }
-
     @ApiIgnore
     @PostMapping("/v3api/notify")
     public String sNotify(@ModelAttribute ToPayNotify toPayNotify){
         return service.sNotify(toPayNotify);
     }
+    @ApiIgnore
     @GetMapping("/v3api/ePayNotify")
     public String ePayNotify(@ModelAttribute EPayNotify ePayNotify){
         return service.ePayNotify(ePayNotify);
