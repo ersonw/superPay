@@ -2,12 +2,7 @@ package com.example.superpay.dao;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.superpay.entity.Order;
-import com.example.superpay.util.TimeUtil;
-import com.mongodb.BasicDBObject;
-import com.mongodb.client.AggregateIterable;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,14 +35,14 @@ public class OrderDao {
         AggregationResults<Order> results = mongoTemplate.aggregate(newAggregation(
                 match(criteria)
                 ,sort(pageable.getSort())
-                ,skip(pageable.getPageNumber())
+//                ,skip(pageable.getPageNumber())
                 ,limit(pageable.getPageSize())
         ), "order", Order.class);
 //        System.out.printf("ids: %s\n", results.getMappedResults());
         Long count = getOrdersCount(id);
         int total = count> 0?Long.valueOf(count/ pageable.getPageSize()).intValue():0;
         double to = count> 0?count.doubleValue()/ pageable.getPageSize():0;
-        Page<Order> orderPage = new Page<Order>() {
+        return new Page<Order>() {
             @Override
             public int getTotalPages() {
                 return to>total?total+1:total;
@@ -128,7 +123,6 @@ public class OrderDao {
                 return null;
             }
         };
-        return orderPage;
     }
     public Long getOrdersCount(String id){
         if (StringUtils.isEmpty(id)) return 0L;
@@ -150,8 +144,8 @@ public class OrderDao {
         if (ids.isEmpty()) return new ArrayList<>();
         Criteria criteria =new Criteria();
         List<Criteria> criteriaList = new ArrayList<>();
-        for (int i = 0; i < ids.size(); i++) {
-            criteriaList.add(Criteria.where("_id").is(ids.get(i)));
+        for (String id : ids) {
+            criteriaList.add(Criteria.where("_id").is(id));
         }
         criteria.orOperator(criteriaList);
         AggregationResults<Order> results = mongoTemplate.aggregate(newAggregation(

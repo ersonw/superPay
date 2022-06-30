@@ -27,6 +27,41 @@ public class ApiControl {
                                   @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
         return service.dayData(User.getUser(user),ip);
     }
+    @GetMapping("/ipList/add")
+    public ResponseData ipListAdd(@RequestParam(value = "address",required = false) String address,
+                               @RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
+                                  @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
+        return service.ipListAdd(address,User.getUser(user),ip);
+    }
+    @PostMapping("/ipList/del")
+    @ApiGlobalModel(component = pData.class, value = "selected")
+    public ResponseData ipListDel(@RequestBody pData data){
+        return service.ipListDel(data.getSelected(),data.getUser(),data.getIp());
+    }
+    @GetMapping("/ipList/clear")
+    public ResponseData ipListClear(@RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
+                                  @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
+        return service.ipListClear(User.getUser(user),ip);
+    }
+    @GetMapping("/ipList/{page}")
+    public ResponseData ipList(@PathVariable("page") int page,
+                               @RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
+                                  @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
+        return service.ipList(page,User.getUser(user),ip);
+    }
+    @GetMapping("/loging/{page}")
+    public ResponseData loging(@PathVariable("page") int page,
+                               @RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
+                                  @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
+        return service.loging(page,User.getUser(user),ip);
+    }
+    @GetMapping("/ipList/{page}/{address}")
+    public ResponseData ipList(@PathVariable("page") int page,
+                               @PathVariable("address") String address,
+                               @RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
+                                  @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
+        return service.ipList(page,address,User.getUser(user),ip);
+    }
     @GetMapping("/orders/{page}")
     public ResponseData orders(@PathVariable("page") int page,
             @RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
@@ -51,10 +86,10 @@ public class ApiControl {
         return service.orderNo(page,orderNo,User.getUser(user),ip);
     }
     @GetMapping("/orderDetails/{id}")
-    public ResponseData orderDetails(@PathVariable("id") String orderNo,
+    public ResponseData orderDetails(@PathVariable("id") String id,
                                      @RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
                                   @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
-        return service.dayData(User.getUser(user),ip);
+        return service.orderDetails(id,User.getUser(user),ip);
     }
     @GetMapping("/merchantDetails")
     public ResponseData merchantDetails(@RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,

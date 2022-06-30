@@ -19,15 +19,15 @@ public class Login {
     private String uid;
     @Field("ip")
     private String ip;
-    @Field("add_time")
-    private long add_time;
+    @Field("addTime")
+    private long addTime;
     public Login(){
         this.id = ToolsUtil.getToken();
     }
     public Login(String uid, String ip){
         this.uid = uid;
         this.ip = ip;
-        this.add_time=System.currentTimeMillis();
+        this.addTime=System.currentTimeMillis();
         this.id = ToolsUtil.getToken();
     }
 }

@@ -7,10 +7,7 @@ import com.example.superpay.dao.OrderDao;
 import com.example.superpay.dao.WithDrawDao;
 import com.example.superpay.data.EPayNotify;
 import com.example.superpay.data.ResponseData;
-import com.example.superpay.entity.Order;
-import com.example.superpay.entity.PayType;
-import com.example.superpay.entity.ThirdParty;
-import com.example.superpay.entity.User;
+import com.example.superpay.entity.*;
 import com.example.superpay.repository.*;
 import com.example.superpay.util.JSONUtil;
 import com.example.superpay.util.TimeUtil;
@@ -24,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -46,13 +44,11 @@ public class ApiService {
     @Autowired
     private AdminDao adminDao;
     @Autowired
+    private IPListRepository ipListRepository;
+    @Autowired
     private LoginRepository loginRepository;
 
     public ResponseData dashboard(User user, String ip) {
-//        System.out.printf("isIpAddress:%s\n",adminDao.isIpAddress(user.getId(), ip));
-//        Pageable pageable = PageRequest.of(0, 1);
-//        Page<Order> orderPage = orderRepository.findAllByAddTimeGreaterThanEqual(1656241208239L,pageable);
-//        System.out.printf(orderPage.getTotalElements()+"\n");
         if (user == null || StringUtils.isEmpty(user.getId())) return ResponseData.error();
         JSONArray array = new JSONArray();
         /**
@@ -216,7 +212,7 @@ public class ApiService {
     }
 
     public ResponseData merchantDetails(User user, String ip, String serverName, int serverPort, String url) {
-        System.out.printf("ip:%s serverName:%s serverPort:%d url:%s\n",ip,serverName,serverPort,url);
+//        System.out.printf("ip:%s serverName:%s serverPort:%d url:%s\n",ip,serverName,serverPort,url);
         if (user == null || StringUtils.isEmpty(user.getId())) return ResponseData.error();
         /**
          * 获取商户信息
@@ -245,7 +241,7 @@ public class ApiService {
         return getOrder(order,false);
     }
     private JSONObject getOrder(Order order, boolean admin){
-        JSONObject object = ResponseData.object("ID", order.getId());
+        JSONObject object = ResponseData.object("id", order.getId());
         if (admin){
             User user = userRepository.findAllById(order.getUid());
             object.put("商户","");
@@ -253,27 +249,27 @@ public class ApiService {
                 object.put("商户",user.getUsername());
             }
         }
-        object.put("商户订单号",order.getOutTradeNo());
-        object.put("交易流水订单号",order.getTradeNo());
+        object.put("outTradeNo",order.getOutTradeNo());
+        object.put("tradeNo",order.getTradeNo());
 //        object.put("三方渠道","");
-        object.put("支付方式","");
+        object.put("type","");
         ThirdParty party = thirdPartyRepository.findAllById(order.getThirdPartyId());
         if (party != null){
 //            object.put("三方渠道",party.getTitle());
             PayType type = payTypeRepository.findAllById(party.getTypeId());
             if (type != null){
-                object.put("支付方式",type.getName());
+                object.put("type",type.getName());
             }
         }
-        object.put("订单金额",order.getMoney()+"元");
-        object.put("实付金额",order.getTotalFee()+"元");
-        object.put("手续费",order.getFee()+"元");
+        object.put("money",order.getMoney()+"元");
+        object.put("totalFee",order.getTotalFee()+"元");
+        object.put("fee",order.getFee()+"元");
 
-        object.put("订单通知状态",order.getNotifyState() == 1?"已通知":"未通知");
-        object.put("订单交易状态",order.getState() == 1?"成功":"失败");
+        object.put("notifyState",order.getNotifyState() == 1?"已通知":"未通知");
+        object.put("state",order.getState() == 1?"成功":"失败");
 
-//        object.put("更新时间",TimeUtil.getDateTime(order.getUpdateTime()));
-        object.put("下订单时间",TimeUtil.getDateTime(order.getAddTime()));
+        object.put("updateTime",order.getUpdateTime());
+        object.put("addTime",order.getAddTime());
         return object;
     }
     private JSONArray getOrders(List<Order> orders){
@@ -285,6 +281,21 @@ public class ApiService {
         }
         return array;
     }
+    private JSONObject getOrderColumns(){
+        JSONObject object = new JSONObject();
+        object.put("outTradeNo","商户订单号");
+        object.put("'tradeNo'","交易订单号");
+        object.put("id","平台订单");
+        object.put("type","支付方式");
+        object.put("money","订单金额");
+        object.put("totalFee","实付金额");
+        object.put("fee","手续费");
+        object.put("notifyState","订单通知状态");
+        object.put("state","订单交易状态");
+        object.put("addTime","创建时间");
+        object.put("updateTime","更新时间");
+        return object;
+    }
     public ResponseData orders(int page, User user, String ip) {
         if (user == null) return ResponseData.error();
         page--;
@@ -293,6 +304,8 @@ public class ApiService {
         Page<Order> orderPage = orderRepository.findAllByUid(user.getId(),pageable);
         JSONObject object = ResponseData.object("total", orderPage.getTotalPages());
         object.put("list", getOrders(orderPage.getContent()));
+//        object.put("columns", getOrderColumns());
+//        object.put("list", orderPage.getContent());
         return ResponseData.success(object);
     }
 
@@ -332,6 +345,116 @@ public class ApiService {
         Page<Order> orderPage = orderDao.getOrders(orderNo,pageable);
         JSONObject object = ResponseData.object("total", orderPage.getTotalPages());
         object.put("list", getOrders(orderPage.getContent()));
+        return ResponseData.success(object);
+    }
+
+    public ResponseData orderDetails(String id, User user, String ip) {
+        if (user == null) return ResponseData.error();
+        if(StringUtils.isEmpty(id)) return ResponseData.error("id cannot be empty!");
+        Order order = orderRepository.findAllById(id);
+        if (order == null) return ResponseData.error("id not found!");
+        JSONObject object = ResponseData.object("Id", order.getId());
+        object.put("OutTradeNo",order.getOutTradeNo());
+        object.put("TradeNo",order.getTradeNo());
+        ThirdParty party = thirdPartyRepository.findAllById(order.getThirdPartyId());
+        if (party != null){
+            object.put("ThirdParty",party.getTitle());
+            PayType type = payTypeRepository.findAllById(party.getTypeId());
+            if (type != null){
+                object.put("Type",type.getName());
+            }
+        }
+        object.put("Money",order.getMoney());
+        object.put("TotalFee",order.getTotalFee());
+        object.put("Fee",order.getFee());
+        object.put("NotifyState",order.getNotifyState()==1?"已通知":"未通知");
+        object.put("State",order.getState()==1?"已通知":"未通知");
+        if (user.isAdmin()){
+            User u = userRepository.findAllById(order.getUid());
+            object.put("Username","");
+            if (u != null){
+                object.put("Username",u.getUsername());
+            }
+            object.put("ReturnUrl",order.getReturnUrl());
+            object.put("NotifyUrl",order.getNotifyUrl());
+        }
+        object.put("AddTime",TimeUtil.getDateTime(order.getAddTime()));
+        object.put("UpdateTime",TimeUtil.getDateTime(order.getUpdateTime()));
+        return ResponseData.success(object);
+    }
+
+
+    public ResponseData ipList(int page, User user, String ip) {
+        if (user == null) return ResponseData.error();
+        page--;
+        if (page < 0) page=0;
+        Pageable pageable = PageRequest.of(page,30, Sort.by(Sort.Direction.DESC,"addTime"));
+        Page<IpList> ipLists = ipListRepository.findAllByUid(user.getId(),pageable);
+        JSONObject object = ResponseData.object("total", ipLists.getTotalPages());
+        JSONArray array = new JSONArray();
+        for (IpList ipList : ipLists.getContent()) {
+            JSONObject json = JSONObject.parseObject(JSONObject.toJSONString(ipList));
+            json.put("addTime",TimeUtil.getDateTime(ipList.getAddTime()));
+            json.put("updateTime",TimeUtil.getDateTime(ipList.getUpdateTime()));
+            json.put("uid","");
+            array.add(json);
+        }
+        object.put("list", array);
+        return ResponseData.success(object);
+    }
+    public ResponseData ipList(int page, String address, User user, String ip) {
+        if (user == null) return ResponseData.error();
+        page--;
+        if (page < 0) page=0;
+        Pageable pageable = PageRequest.of(page,30, Sort.by(Sort.Direction.DESC,"addTime"));
+        Page<IpList> ipLists = adminDao.getIps(address,pageable);
+        JSONObject object = ResponseData.object("total", ipLists.getTotalPages());
+        JSONArray array = new JSONArray();
+        for (IpList ipList : ipLists.getContent()) {
+            JSONObject json = JSONObject.parseObject(JSONObject.toJSONString(ipList));
+            json.put("addTime",TimeUtil.getDateTime(ipList.getAddTime()));
+            json.put("updateTime",TimeUtil.getDateTime(ipList.getUpdateTime()));
+            json.put("uid","");
+            array.add(json);
+        }
+        object.put("list", array);
+        return ResponseData.success(object);
+    }
+    public ResponseData ipListAdd(String address, User user, String ip) {
+        if (user == null) return ResponseData.error();
+        if(!ToolsUtil.isCorrectIp2(address)) return ResponseData.error("IP地址格式不正确!");
+        if(adminDao.isExistsIp(user.getId(),address)) return ResponseData.error("IP 地址已存在！");
+        IpList ipList = new IpList(user.getId(),address);
+        ipListRepository.save(ipList);
+        return ResponseData.success(ResponseData.object("add",true));
+    }
+    public ResponseData ipListDel(List<String> selected, User user, String ip) {
+        if (user == null) return ResponseData.error();
+        if(selected.isEmpty()) return ResponseData.error("");
+        ipListRepository.deleteAllById(selected);
+        return ResponseData.success(ResponseData.object("state",true));
+    }
+    public ResponseData ipListClear(User user, String ip) {
+        if (user == null) return ResponseData.error();
+        ipListRepository.deleteAllByUid(user.getId());
+        return ResponseData.success(ResponseData.object("clear",true));
+    }
+
+    public ResponseData loging(int page, User user, String ip) {
+        if (user == null) return ResponseData.error();
+        page--;
+        if (page < 0) page=0;
+        Pageable pageable = PageRequest.of(page,30, Sort.by(Sort.Direction.DESC,"addTime"));
+        Page<Login> loginPage = loginRepository.findAllByUid(user.getId(),pageable);
+        JSONObject object = ResponseData.object("total", loginPage.getTotalPages());
+        JSONArray array = new JSONArray();
+        for (Login login : loginPage.getContent()) {
+            JSONObject json = JSONObject.parseObject(JSONObject.toJSONString(login));
+            json.put("addTime",TimeUtil.getDateTime(login.getAddTime()));
+            json.put("uid","");
+            array.add(json);
+        }
+        object.put("list", array);
         return ResponseData.success(object);
     }
 }

@@ -30,7 +30,7 @@ public class UserService {
     public ResponseData login(String username, String password, String ip) {
         log.error("ip address:{}, username:{}, password:{}", ip, username,password);
         User user = userRepository.findAllByUsername(username);
-        if(user == null ) return  ResponseData.error("user not found");
+        if(user == null ) return  ResponseData.error();
         if(!adminDao.isIpAddress(user.getId(), ip)) return  ResponseData.error("IP 地址不在白名单内！");
         if(user.getState() == -1) return  ResponseData.error("用户状态异常，请联系管理员");
         if(!verifyPassword(user.getPassword(),password,user.getSalt())) return ResponseData.error("password is Blank!");
@@ -48,7 +48,7 @@ public class UserService {
     }
 
     public ResponseData info(User user, String ip) {
-        if (user == null) return ResponseData.error("user not found!");
+        if (user == null) return ResponseData.error();
         User u = userRepository.findAllById(user.getId());
         if (u == null) return ResponseData.error("user not found!");
         if(!adminDao.isIpAddress(u.getId(), ip)) return  ResponseData.error("IP 地址不在白名单内！");

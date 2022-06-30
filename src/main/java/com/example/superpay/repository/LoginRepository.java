@@ -11,5 +11,5 @@ public interface LoginRepository extends PagingAndSortingRepository<Login, Strin
     //分页查询
     public Page<Login> findAll(Pageable pageable);
     public Login findAllById(String id);
-    public Login findAllByUid(String uid);
+    public Page<Login> findAllByUid(String uid, Pageable pageable);
 }
