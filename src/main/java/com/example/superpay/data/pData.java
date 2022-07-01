@@ -49,6 +49,11 @@ public  class pData  {
     @ApiModelProperty(name = "newValue", value= "新数据",required = false)
     private String newValue;
 
+    @ApiModelProperty(name = "callbackUrl", value= "同步返回地址",required = false)
+    private String callbackUrl;
+    @ApiModelProperty(name = "notifyUrl", value= "异步返回地址",required = false)
+    private String notifyUrl;
+
 
     @ApiModelProperty(name = "files", value= "文件列表",required = false)
     private String files;

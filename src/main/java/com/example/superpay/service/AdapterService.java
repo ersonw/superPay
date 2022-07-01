@@ -84,6 +84,7 @@ public class AdapterService {
         }else {
             return ToolsUtil.errorHtml("异步通知地址不可为空！");
         }
+        if(!order.getReturnUrl().startsWith("http") || !order.getNotifyUrl().startsWith("http")) return ToolsUtil.errorHtml("通知回调地址不可为空！");
         order.setMoney(new BigDecimal(ePay.getMoney()).doubleValue());
         order.setName(ePay.getName());
         order.setAddTime(System.currentTimeMillis());

@@ -59,6 +59,19 @@ public class UserControl {
                              @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
         return service.info(User.getUser(user),ip);
     }
+    @GetMapping("/details")
+    public ResponseData details(@RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
+                                @RequestParam(value = "ip") @ApiParam(hidden = true) String ip,
+                                @RequestParam(value = "url",required = false) @ApiParam(hidden = true) String url,
+                                @RequestParam(value = "serverName",required = false) @ApiParam(hidden = true) String serverName,
+                                @RequestParam(value = "serverPort",defaultValue = "80") @ApiParam(hidden = true) int serverPort){
+        return service.details(User.getUser(user),ip,serverName,serverPort,url);
+    }
+    @PostMapping("/details/change")
+    @ApiGlobalModel(component = pData.class, value = "callbackUrl,notifyUrl")
+    public ResponseData detailsChange(@RequestBody pData data){
+        return service.detailsChange(data.getCallbackUrl(),data.getNotifyUrl(),data.getUser(), data.getIp());
+    }
     @GetMapping("/logout")
     public ResponseData logout(@RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
                              @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){

@@ -92,4 +92,43 @@ public class UserService {
         authDao.pushUser(user);
         return ResponseData.success(ResponseData.object("state",true));
     }
+
+    public ResponseData details(User user, String ip, String serverName, int serverPort, String url) {
+        if (user == null) return ResponseData.error();
+        /**
+         * 获取商户信息
+         */
+        JSONObject object = ResponseData.object("Pid", user.getPid());
+        object.put("SecretKey",user.getSecretKey());
+        /**
+         * 获取支付网关
+         */
+        StringBuilder sb = new StringBuilder();
+        if (url.startsWith("https")){
+            sb.append("https://").append(serverName);
+        }else {
+            sb.append("http://").append(serverName);
+        }
+        if(serverPort != 80){
+            sb.append(":").append(serverPort);
+        }
+//        object.put("网关地址",sb+"/");
+        object.put("Documentation",sb+"/swagger-ui.html");
+        sb.append("/v3api/Polymer");
+        object.put("EPayUrl",sb.toString());
+        object.put("CallbackUrl",user.getCallbackUrl());
+        object.put("NotifyUrl",user.getNotifyUrl());
+        return ResponseData.success(object);
+    }
+
+    public ResponseData detailsChange(String callbackUrl, String notifyUrl, User user, String ip) {
+        if (user == null) return ResponseData.error();
+        if(!callbackUrl.startsWith("http")) return ResponseData.error("callbackUrl must start with http:// or https://");
+        if(!notifyUrl.startsWith("http")) return ResponseData.error("notifyUrl must start with http:// or https://");
+        user.setCallbackUrl(callbackUrl);
+        user.setNotifyUrl(notifyUrl);
+        userRepository.save(user);
+        authDao.pushUser(user);
+        return ResponseData.success(ResponseData.object("state",true));
+    }
 }

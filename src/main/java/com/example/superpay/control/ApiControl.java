@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "/api", tags = "管理后台")
+//@Api(value = "/api", tags = "管理后台")
 @RestController
 @RequestMapping("/api")
 public class ApiControl {
