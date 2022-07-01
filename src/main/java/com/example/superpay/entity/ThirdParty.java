@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @ToString(includeFieldNames = true)
 @Setter
 @Getter
-@Document(collection = "third_party")
+@Document(collection = "ThirdParty")
 public class ThirdParty {
     public ThirdParty(){
         id = ToolsUtil.getToken();

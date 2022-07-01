@@ -44,6 +44,10 @@ public  class pData  {
 
     @ApiModelProperty(name = "text", value= "字符串",required = false)
     private String text;
+    @ApiModelProperty(name = "oldValue", value= "旧数据",required = false)
+    private String oldValue;
+    @ApiModelProperty(name = "newValue", value= "新数据",required = false)
+    private String newValue;
 
 
     @ApiModelProperty(name = "files", value= "文件列表",required = false)

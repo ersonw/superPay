@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.UUID;
 
-@Api(value = "/api/user", tags = "用户接口")
+//@Api(value = "/api/user", tags = "用户接口")
 @ApiResponses({
         @ApiResponse(code = 200, message = "成功"),
         @ApiResponse(code = 105, message = "未带token请求"),
@@ -41,6 +41,11 @@ public class UserControl {
     @Autowired
     private UserService service;
 
+    @PostMapping("/password")
+    @ApiGlobalModel(component = pData.class, value = "oldValue,newValue")
+    public ResponseData userPassword(@RequestBody pData data){
+        return service.userPassword(data.getOldValue(),data.getNewValue(),data.getUser(), data.getIp());
+    }
     @PostMapping("/login")
     @ApiGlobalModel(component = pData.class, value = "username,password")
     public ResponseData login(@RequestBody pData data){
