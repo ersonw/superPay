@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
@@ -65,9 +66,11 @@ public class EPayData {
         JSONObject object = JSONObject.parseObject(JSONObject.toJSONString(this));
         JSONObject json = new JSONObject();
         for (Map.Entry<String, Object> entry: object.entrySet()) {
-            if (entry.getValue() != null &&
+            if (StringUtils.isNotEmpty(entry.getValue().toString()) &&
                     !entry.getKey().equals("sign") &&
-                    !entry.getKey().equals("sign_type ") &&
+                    !entry.getKey().equals("sign_type") &&
+//                    !entry.getKey().equals("name") &&
+//                    !entry.getKey().equals("sitename") &&
                     !entry.getKey().equals("ip")){
                 json.put(entry.getKey(), entry.getValue());
             }
@@ -75,16 +78,19 @@ public class EPayData {
         return json;
     }
     public String getSign(String key) {
-        if (this.getSign_type().equalsIgnoreCase("MD5")){
-            return DigestUtils.md5DigestAsHex((this.toString() + key).getBytes());
-        }
-        if(this.getSign_type().equalsIgnoreCase("WXSING")){
-            return ToolsUtil.getWxSign(JSONUtil.toStringMap(this.getObject()),key);
-        }
-        return null;
+        return ToolsUtil.md5(StringEscapeUtils.unescapeJava(this.toString()) + key);
+//        if (this.getSign_type().equalsIgnoreCase("MD5")){
+//            return DigestUtils.md5DigestAsHex((this.toString() + key).getBytes());
+//        }
+//        if(this.getSign_type().equalsIgnoreCase("WXSING")){
+//            return ToolsUtil.getWxSign(JSONUtil.toStringMap(this.getObject()),key);
+//        }
+//        return null;
     }
     public boolean isSign(String key) {
         if(this.getSign() == null) return false;
+//        System.out.printf("%s\n", StringEscapeUtils.unescapeJava(this.toString())+key);
+//        System.out.printf("%s\n", this.getSign(key));
         return this.getSign(key).equals(this.getSign());
     }
 }

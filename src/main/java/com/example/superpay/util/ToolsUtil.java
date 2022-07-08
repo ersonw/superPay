@@ -25,6 +25,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -145,6 +146,75 @@ public class ToolsUtil {
         Matcher matcher=p.matcher(content);
 
         return matcher.matches();
+    }
+    public static String getEncoding(String str) {
+        String encode = "GB2312";
+        try {
+            if (isEncoding(str, encode)) { // 判断是不是GB2312
+                return encode;
+            }
+        } catch (Exception exception) {
+        }
+        encode = "ISO-8859-1";
+        try {
+            if (isEncoding(str, encode)) { // 判断是不是ISO-8859-1
+                return encode;
+            }
+        } catch (Exception exception1) {
+        }
+        encode = "UTF-8";
+        try {
+            if (isEncoding(str, encode)) { // 判断是不是UTF-8
+                return encode;
+            }
+        } catch (Exception exception2) {
+        }
+        encode = "GBK";
+        try {
+            if (isEncoding(str, encode)) { // 判断是不是GBK
+                return encode;
+            }
+        } catch (Exception exception3) {
+        }
+        return ""; // 如果都不是，说明输入的内容不属于常见的编码格式。
+    }
+
+    public static boolean isEncoding(String str, String encode) {
+        try {
+            if (str.equals(new String(str.getBytes(), encode))) {
+                return true;
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public static String md5(String input){
+        try {
+
+            StringBuilder result = new StringBuilder(input);
+
+            MessageDigest md = MessageDigest.getInstance("MD5"); //or “SHA-1”
+
+            md.update(input.getBytes());
+
+            BigInteger hash = new BigInteger(1, md.digest());
+
+            result = new StringBuilder(hash.toString(16));
+
+            while(result.length() < 32)
+
+            {
+
+                result.insert(0, "0");
+
+            }
+
+            return result.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
     public static String getJsonBodyString(HttpServletRequest httpServletRequest) {
         try {
@@ -293,27 +363,27 @@ public class ToolsUtil {
         }
         return strret;
     }
-    public static String md5(String plainText) {
-        StringBuffer buf = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(plainText.getBytes());
-            byte b[] = md.digest();
-            int i;
-            buf = new StringBuffer("");
-            for (int offset = 0; offset < b.length; offset++) {
-                i = b[offset];
-                if (i < 0)
-                    i += 256;
-                if (i < 16)
-                    buf.append("0");
-                buf.append(Integer.toHexString(i));
-            }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return buf.toString();
-    }
+//    public static String md5(String plainText) {
+//        StringBuffer buf = null;
+//        try {
+//            MessageDigest md = MessageDigest.getInstance("MD5");
+//            md.update(plainText.getBytes());
+//            byte b[] = md.digest();
+//            int i;
+//            buf = new StringBuffer("");
+//            for (int offset = 0; offset < b.length; offset++) {
+//                i = b[offset];
+//                if (i < 0)
+//                    i += 256;
+//                if (i < 16)
+//                    buf.append("0");
+//                buf.append(Integer.toHexString(i));
+//            }
+//        } catch (NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        }
+//        return buf.toString();
+//    }
     public static String encrypt(String key, String src){
         String p = null;
 //        String src = "name=Alice&text=Hello";

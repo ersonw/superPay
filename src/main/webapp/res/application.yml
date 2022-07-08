@@ -1,5 +1,8 @@
 server:
   port: 8000
+  servlet:
+    encoding:
+      charset: utf-8
 spring:
   redis:
     host: super-os

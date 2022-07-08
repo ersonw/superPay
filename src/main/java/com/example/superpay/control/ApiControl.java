@@ -100,4 +100,9 @@ public class ApiControl {
                                         ){
         return service.merchantDetails(User.getUser(user),ip,serverName,serverPort,url);
     }
+    @GetMapping("/withdraw/dashboard")
+    public ResponseData withdrawDashboard(@RequestParam(value = "user",required = false) @ApiParam(hidden = true) String user,
+                               @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
+        return service.withdrawDashboard(User.getUser(user),ip);
+    }
 }

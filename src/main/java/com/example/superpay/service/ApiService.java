@@ -268,8 +268,8 @@ public class ApiService {
         object.put("notifyState",order.getNotifyState() == 1?"已通知":"未通知");
         object.put("state",order.getState() == 1?"成功":"失败");
 
-        object.put("updateTime",order.getUpdateTime());
-        object.put("addTime",order.getAddTime());
+        object.put("updateTime",TimeUtil.getDateTime(order.getUpdateTime()));
+        object.put("addTime",TimeUtil.getDateTime(order.getAddTime()));
         return object;
     }
     private JSONArray getOrders(List<Order> orders){
@@ -302,6 +302,9 @@ public class ApiService {
         if (page < 0) page=0;
         Pageable pageable = PageRequest.of(page,30, Sort.by(Sort.Direction.DESC,"addTime"));
         Page<Order> orderPage = orderRepository.findAllByUid(user.getId(),pageable);
+        if(user.isAdmin()){
+            orderPage = orderRepository.findAll(pageable);
+        }
         JSONObject object = ResponseData.object("total", orderPage.getTotalPages());
         object.put("list", getOrders(orderPage.getContent()));
 //        object.put("columns", getOrderColumns());
@@ -342,7 +345,10 @@ public class ApiService {
         page--;
         if (page < 0) page = 0;
         Pageable pageable = PageRequest.of(page,30,Sort.by(Sort.Direction.DESC,"addTime"));
-        Page<Order> orderPage = orderDao.getOrders(orderNo,pageable);
+        Page<Order> orderPage = orderDao.getOrders(orderNo,user.getId(),pageable);
+        if (user.isAdmin()){
+            orderPage = orderDao.getOrders(orderNo,pageable);
+        }
         JSONObject object = ResponseData.object("total", orderPage.getTotalPages());
         object.put("list", getOrders(orderPage.getContent()));
         return ResponseData.success(object);
@@ -456,5 +462,10 @@ public class ApiService {
         }
         object.put("list", array);
         return ResponseData.success(object);
+    }
+
+    public ResponseData withdrawDashboard(User user, String ip) {
+        if (user == null) return ResponseData.error();
+        return ResponseData.success();
     }
 }

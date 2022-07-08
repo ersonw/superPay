@@ -23,6 +23,125 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 public class OrderDao {
     @Autowired
     private MongoTemplate mongoTemplate;
+    public Page<Order> getOrders(String id, String uid, Pageable pageable){
+        if (StringUtils.isEmpty(id) || StringUtils.isEmpty(uid)) return null;
+        Criteria criteria =new Criteria();
+        List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where("_id").regex(id));
+        criteriaList.add(Criteria.where("orderId").regex(id));
+        criteriaList.add(Criteria.where("outTradeNo").regex(id));
+        criteriaList.add(Criteria.where("tradeNo").regex(id));
+        criteriaList.add(Criteria.where("uid").regex(uid));
+        criteria.orOperator(criteriaList);
+        AggregationResults<Order> results = mongoTemplate.aggregate(newAggregation(
+                match(criteria)
+                ,sort(pageable.getSort())
+//                ,skip(pageable.getPageNumber())
+                ,limit(pageable.getPageSize())
+        ), "order", Order.class);
+//        System.out.printf("ids: %s\n", results.getMappedResults());
+        Long count = getOrdersCount(id,uid);
+        int total = count> 0?Long.valueOf(count/ pageable.getPageSize()).intValue():0;
+        double to = count> 0?count.doubleValue()/ pageable.getPageSize():0;
+        return new Page<Order>() {
+            @Override
+            public int getTotalPages() {
+                return to>total?total+1:total;
+            }
+
+            @Override
+            public long getTotalElements() {
+                return 0;
+            }
+
+            @Override
+            public <U> Page<U> map(Function<? super Order, ? extends U> converter) {
+                return null;
+            }
+
+            @Override
+            public int getNumber() {
+                return 0;
+            }
+
+            @Override
+            public int getSize() {
+                return 0;
+            }
+
+            @Override
+            public int getNumberOfElements() {
+                return 0;
+            }
+
+            @Override
+            public List<Order> getContent() {
+                return results.getMappedResults();
+            }
+
+            @Override
+            public boolean hasContent() {
+                return false;
+            }
+
+            @Override
+            public Sort getSort() {
+                return null;
+            }
+
+            @Override
+            public boolean isFirst() {
+                return false;
+            }
+
+            @Override
+            public boolean isLast() {
+                return false;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return false;
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return false;
+            }
+
+            @Override
+            public Pageable nextPageable() {
+                return null;
+            }
+
+            @Override
+            public Pageable previousPageable() {
+                return null;
+            }
+
+            @Override
+            public Iterator<Order> iterator() {
+                return null;
+            }
+        };
+    }
+    public Long getOrdersCount(String id, String uid){
+        if (StringUtils.isEmpty(id)) return 0L;
+        Criteria criteria =new Criteria();
+        List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where("_id").regex(id));
+        criteriaList.add(Criteria.where("orderId").regex(id));
+        criteriaList.add(Criteria.where("outTradeNo").regex(id));
+        criteriaList.add(Criteria.where("tradeNo").regex(id));
+        criteriaList.add(Criteria.where("uid").regex(uid));
+        criteria.orOperator(criteriaList);
+        AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
+                match(criteria)
+                ,group().count().as("count")), "order", JSONObject.class);
+//        System.out.printf("ids: %s\n", results.getMappedResults());
+        if(results.getMappedResults().isEmpty()) return 0L;
+        return results.getMappedResults().get(0).getLong("count");
+    }
     public Page<Order> getOrders(String id, Pageable pageable){
         if (StringUtils.isEmpty(id)) return null;
         Criteria criteria =new Criteria();

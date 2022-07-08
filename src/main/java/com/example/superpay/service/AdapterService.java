@@ -1,5 +1,6 @@
 package com.example.superpay.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.superpay.data.*;
 import com.example.superpay.entity.*;
 import com.example.superpay.repository.OrderRepository;
@@ -40,6 +41,7 @@ public class AdapterService {
     private ThirdPartyRepository thirdPartyRepository;
 
     public ModelAndView ePayOrder(EPayData ePay) {
+//        System.out.printf(JSONObject.toJSONString(ePay));
         if (ePay.getPid() == 0) {
             return ToolsUtil.errorHtml("商户ID不为空!");
         }
@@ -86,7 +88,7 @@ public class AdapterService {
         }
         if(!order.getReturnUrl().startsWith("http") || !order.getNotifyUrl().startsWith("http")) return ToolsUtil.errorHtml("通知回调地址不可为空！");
         order.setMoney(new BigDecimal(ePay.getMoney()).doubleValue());
-        order.setName(ePay.getName());
+//        order.setName(ePay.getName());
         order.setAddTime(System.currentTimeMillis());
         order.setUpdateTime(System.currentTimeMillis());
 

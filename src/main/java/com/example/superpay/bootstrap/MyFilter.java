@@ -87,6 +87,8 @@ public class MyFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (req instanceof HttpServletRequest) {
             HttpServletRequest request = (HttpServletRequest) req;
+//            System.out.printf(request.getCharacterEncoding());
+//            request.setCharacterEncoding("utf-8");
 //            if(isNotRes(request.getRequestURI())){
 //                chain.doFilter(request, response);
 //                return;
@@ -112,6 +114,7 @@ public class MyFilter implements Filter {
             }
 //            System.out.printf(token);
             if (request.getMethod().equals("GET")){
+                request = new MyRequest(request);
                 Map<String, String[]> parameterMap = new HashMap(request.getParameterMap());
                 ParameterRequestWrapper wrapper = new ParameterRequestWrapper(request, parameterMap);
                 wrapper.addParameter("ip", ip);
@@ -153,7 +156,9 @@ public class MyFilter implements Filter {
 //                        Map<String, String[]> parameterMap = JSONObject.parseObject(postContent, new TypeReference<Map<String, String[]>>(){});
 //                        request = new ParameterRequestWrapper(request, parameterMap);
                     }else{
+                        request = new MyRequest(request);
                         Map<String, String[]> parameterMap = new HashMap(request.getParameterMap());
+//                        System.out.printf(parameterMap.toString());
                         parameterMap.put("ip", new String[]{ip});
                         parameterMap.put("serverName", new String[]{serverName});
                         parameterMap.put("serverPort", new String[]{String.valueOf(serverPort)});
