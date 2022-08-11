@@ -1,6 +1,7 @@
 package com.example.superpay.util;
 
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -99,9 +100,20 @@ public class ToolsUtil {
         error.addObject("msg",msg);
         return error;
     }
-    public static ModelAndView postHtml(String url){
+    public static ModelAndView postHtml(String url, JSONObject params){
         ModelAndView post = new ModelAndView("payHtml/post");
         post.addObject("url",url);
+        post.addObject("params",params);
+        return post;
+    }
+    public static ModelAndView getHtml(String url){
+        ModelAndView post = new ModelAndView("payHtml/get");
+        post.addObject("url",url);
+        return post;
+    }
+    public static ModelAndView emptyHtml(String data){
+        ModelAndView post = new ModelAndView("payHtml/empty");
+        post.addObject("data",data);
         return post;
     }
     public static ModelAndView waitHtml(){

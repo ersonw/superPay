@@ -126,6 +126,11 @@
 			<artifactId>opencc4j</artifactId>
 			<version>1.0.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.alipay.sdk</groupId>
+			<artifactId>alipay-sdk-java</artifactId>
+			<version>4.33.1.ALL</version>
+		</dependency>
 	</dependencies>
 
 	<build>

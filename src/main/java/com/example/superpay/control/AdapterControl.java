@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Api(value = "/v3api", tags = "下单网关")
 @RestController
 //@RequestMapping("/api/adapter")
@@ -24,4 +26,9 @@ public class AdapterControl {
         return service.ePayNotify(ePayNotify);
     }
 
+    @ApiIgnore
+    @PostMapping("/v3api/alipayNotify")
+    public String alipayNotify(@ModelAttribute AlipayNotifyParam param, HttpServletRequest req){
+        return service.alipayNotify(param,req);
+    }
 }

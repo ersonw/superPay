@@ -1,10 +1,7 @@
 package com.example.superpay.control;
 
 import com.alibaba.fastjson.JSONObject;
-import com.example.superpay.data.EPayData;
-import com.example.superpay.data.EPayNotify;
-import com.example.superpay.data.PayData;
-import com.example.superpay.data.ToPayNotify;
+import com.example.superpay.data.*;
 import com.example.superpay.service.AdapterService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import springfox.documentation.annotations.ApiIgnore;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Api(value = "/v3api", tags = "下单网关")
 @Controller
@@ -27,6 +26,12 @@ public class CallbackControl {
     @GetMapping("/v3api/test")
     public ModelAndView test(){
         return service.ePayOrder(service.test());
+    }
+    @ApiIgnore
+    @GetMapping("/v3api/alipay")
+    public ModelAndView alipay(@ModelAttribute AlipayNotifyParam param, HttpServletRequest req){
+//        System.out.printf(ePayNotify+"\n");
+        return service.alipay(param,req);
     }
     @ApiIgnore
     @GetMapping("/v3api/ePayReturn")

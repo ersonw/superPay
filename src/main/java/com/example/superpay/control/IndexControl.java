@@ -18,15 +18,15 @@ public class IndexControl{
     }
     @GetMapping(value = "/admin")
     public ModelAndView admin1(){
-        return ToolsUtil.postHtml("/admin/index.html");
+        return ToolsUtil.getHtml("/admin/index.html");
     }
     @GetMapping(value = "/admin/")
     public ModelAndView admin(){
-        return ToolsUtil.postHtml("/admin/index.html");
+        return ToolsUtil.getHtml("/admin/index.html");
     }
     @GetMapping(value = "/admin/index")
     public ModelAndView adminIndex(){
-        return ToolsUtil.postHtml("/admin/index.html");
+        return ToolsUtil.getHtml("/admin/index.html");
     }
     public String getClassPath(){
         return getClassPath("/");

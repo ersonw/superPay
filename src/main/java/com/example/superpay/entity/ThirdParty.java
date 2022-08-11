@@ -26,6 +26,7 @@ public class ThirdParty {
     private String notifyUrl;
     private String errorUrl;
     private String secretKey;
+    private String publicKey;
     private String typeId;
     private int third = 0;
     private int state=0;

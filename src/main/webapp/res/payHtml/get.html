@@ -5,10 +5,8 @@
     <title>支付跳转中....</title>
 </head>
 <body onload="_get()">
-<form th:action="${url}" method="post">
-    <input th:each="item,stat:${params}" type="hidden" th:name="${stat.current.key}" th:value="${stat.current.value}">
-    <button type="submit" id="a0001" hidden>正在跳转...</button>
-</form>
+<a id="a0001" th:href="${url}"></a>
+<!--<meta http-equiv="refresh" content="0;url=th:text="${post}"">-->
 <script type="text/javascript">
     function _get(){
         window.document.getElementById("a0001").click();

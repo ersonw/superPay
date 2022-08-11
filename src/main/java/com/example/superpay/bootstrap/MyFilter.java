@@ -102,6 +102,7 @@ public class MyFilter implements Filter {
             String serverPort = String.valueOf(request.getServerPort());//返回服务器的端口号
             String uri = request.getRequestURI();//返回请求行中的资源名称
             String url = request.getRequestURL().toString();//获得客户端发送请求的完整url
+            String schema = request.getScheme();
 //            System.out.printf("ServerName:%s ServerPort:%d uri:%s URL:%s\n",serverName,serverPort,uri,url);
 
             User user = null;
@@ -122,6 +123,7 @@ public class MyFilter implements Filter {
                 wrapper.addParameter("serverPort", String.valueOf(serverPort));
                 wrapper.addParameter("uri", uri);
                 wrapper.addParameter("url", url);
+                wrapper.addParameter("schema", schema);
                 if (user != null){
                     wrapper.addParameter("user", JSONObject.toJSONString(user));
                 }
@@ -146,6 +148,7 @@ public class MyFilter implements Filter {
                         jsStr.put("serverPort", serverPort);
                         jsStr.put("uri", uri);
                         jsStr.put("url", url);
+                        jsStr.put("schema", schema);
                         if (user != null) {
                             jsStr.put("user", JSONObject.toJSONString(user));
                         }
@@ -164,6 +167,7 @@ public class MyFilter implements Filter {
                         parameterMap.put("serverPort", new String[]{String.valueOf(serverPort)});
                         parameterMap.put("uri", new String[]{uri});
                         parameterMap.put("url", new String[]{url});
+                        parameterMap.put("schema", new String[]{schema});
                         if (user != null) {
                             parameterMap.put("user", new String[]{JSONObject.toJSONString(user)});
                         }
