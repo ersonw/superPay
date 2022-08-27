@@ -31,6 +31,9 @@ import java.util.List;
 @Service
 public class AdapterService {
     private static int PAY_TYPE_INDEX = 0;
+    private static final int PAY_TYPE_DEFAULT = 0;
+    private static final int PAY_TYPE_NATIVE = 1;
+    private static final int PAY_TYPE_EPAY = 2;
     @Autowired
     private MongoTemplate mongoTemplate;
     @Autowired
@@ -106,24 +109,30 @@ public class AdapterService {
 
     private ModelAndView handlerThirdParty(ThirdParty thirdParty, Order order, String type) {
         switch (thirdParty.getThird()) {
-            case 0:
+            case PAY_TYPE_DEFAULT:
                 String url = ThirdPartyUtil.toPay(order, thirdParty);
-                if (url == null) {
-                    return ToolsUtil.errorHtml("未获取到第三方资源！");
-                }
-                orderRepository.save(order);
-                return ToolsUtil.getHtml(url);
-            case 1:
-                if (type.equals("wxpay")){}else if (type.equals("alipay")){
-                    String data = AlipayUtil.alipay(thirdParty,order);
-                    if (data == null) {
-                        return ToolsUtil.errorHtml("未获取到第三方资源！");
-                    }
+                if (url != null) {
                     orderRepository.save(order);
-                    return ToolsUtil.emptyHtml(data);
+                    return ToolsUtil.getHtml(url);
                 }
+                break;
+            case PAY_TYPE_NATIVE:
+                if (type.equals("wxpay")){
+//
+                }else if (type.equals("alipay")){
+                    String data = AlipayUtil.alipay(thirdParty,order);
+                    if (data != null) {
+                        orderRepository.save(order);
+                        return ToolsUtil.emptyHtml(data);
+                    }
+                }
+                break;
+            case PAY_TYPE_EPAY:
+                break;
+            default:
+                break;
         }
-        return null;
+        return ToolsUtil.errorHtml("未获取到第三方资源！");
     }
 
     private ThirdParty getThird(String type) {
