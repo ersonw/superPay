@@ -104,75 +104,78 @@ public class MyFilter implements Filter {
             String url = request.getRequestURL().toString();//获得客户端发送请求的完整url
             String schema = request.getScheme();
 //            System.out.printf("ServerName:%s ServerPort:%d uri:%s URL:%s\n",serverName,serverPort,uri,url);
-
-            User user = null;
-            if (StringUtils.isNotEmpty(token)){
-                if (token.equals("04b4b58apiVb84b9Zp4f6cxXxb25b33S69700d6e85e92UJ")) {
-                    user = userDao.findAllById("8045ca21MnP21b0ZFF44e3IeM9239kkQc2f9f308242egYp");
-                }else{
-                    user = authDao.findUserByToken(token);
+            if (
+                    !uri.equals("/v3api/wxPayNotify")
+            ){
+                User user = null;
+                if (StringUtils.isNotEmpty(token)){
+                    if (token.equals("04b4b58apiVb84b9Zp4f6cxXxb25b33S69700d6e85e92UJ")) {
+                        user = userDao.findAllById("8045ca21MnP21b0ZFF44e3IeM9239kkQc2f9f308242egYp");
+                    }else{
+                        user = authDao.findUserByToken(token);
+                    }
                 }
-            }
 //            System.out.printf(token);
-            if (request.getMethod().equals("GET")){
-                request = new MyRequest(request);
-                Map<String, String[]> parameterMap = new HashMap(request.getParameterMap());
-                ParameterRequestWrapper wrapper = new ParameterRequestWrapper(request, parameterMap);
-                wrapper.addParameter("ip", ip);
-                wrapper.addParameter("serverName", serverName);
-                wrapper.addParameter("serverPort", String.valueOf(serverPort));
-                wrapper.addParameter("uri", uri);
-                wrapper.addParameter("url", url);
-                wrapper.addParameter("schema", schema);
-                if (user != null){
-                    wrapper.addParameter("user", JSONObject.toJSONString(user));
-                }
-                request = wrapper;
-            }else if (request.getMethod().equals("POST")){
-                if (contentType != null){
-                    if (contentType.contains(MediaType.APPLICATION_JSON_VALUE)){
-                        String postContent = ToolsUtil.getJsonBodyString(request);
+                if (request.getMethod().equals("GET")){
+                    request = new MyRequest(request);
+                    Map<String, String[]> parameterMap = new HashMap(request.getParameterMap());
+                    ParameterRequestWrapper wrapper = new ParameterRequestWrapper(request, parameterMap);
+                    wrapper.addParameter("ip", ip);
+                    wrapper.addParameter("serverName", serverName);
+                    wrapper.addParameter("serverPort", String.valueOf(serverPort));
+                    wrapper.addParameter("uri", uri);
+                    wrapper.addParameter("url", url);
+                    wrapper.addParameter("schema", schema);
+                    if (user != null){
+                        wrapper.addParameter("user", JSONObject.toJSONString(user));
+                    }
+                    request = wrapper;
+                }else if (request.getMethod().equals("POST")){
+                    if (contentType != null){
+                        if (contentType.contains(MediaType.APPLICATION_JSON_VALUE)){
+                            String postContent = ToolsUtil.getJsonBodyString(request);
 //                        System.out.println(postContent);
-                        String s =  AESUtils.Decrypt(postContent);
+                            String s =  AESUtils.Decrypt(postContent);
 //                        System.out.printf(s);
-                        if (s != null){
-                            postContent = s;
-                        }
-                        JSONObject jsStr = new JSONObject();
-                        if (StringUtils.isNotEmpty(postContent) && postContent.startsWith("{") && postContent.endsWith("}")) {
-                            //修改、新增、删除参数
-                            jsStr = JSONObject.parseObject(postContent);
-                        }
-                        jsStr.put("ip", ip);
-                        jsStr.put("serverName", serverName);
-                        jsStr.put("serverPort", serverPort);
-                        jsStr.put("uri", uri);
-                        jsStr.put("url", url);
-                        jsStr.put("schema", schema);
-                        if (user != null) {
-                            jsStr.put("user", JSONObject.toJSONString(user));
-                        }
-                        postContent = jsStr.toJSONString();
+                            if (s != null){
+                                postContent = s;
+                            }
+                            JSONObject jsStr = new JSONObject();
+                            if (StringUtils.isNotEmpty(postContent) && postContent.startsWith("{") && postContent.endsWith("}")) {
+                                //修改、新增、删除参数
+                                jsStr = JSONObject.parseObject(postContent);
+                            }
+                            jsStr.put("ip", ip);
+                            jsStr.put("serverName", serverName);
+                            jsStr.put("serverPort", serverPort);
+                            jsStr.put("uri", uri);
+                            jsStr.put("url", url);
+                            jsStr.put("schema", schema);
+                            if (user != null) {
+                                jsStr.put("user", JSONObject.toJSONString(user));
+                            }
+                            postContent = jsStr.toJSONString();
 //                        System.out.println(postContent);
-                        //将参数放入重写的方法中
-                        request = new BodyRequestWrapper(request, postContent);
+                            //将参数放入重写的方法中
+                            request = new BodyRequestWrapper(request, postContent);
 //                        Map<String, String[]> parameterMap = JSONObject.parseObject(postContent, new TypeReference<Map<String, String[]>>(){});
 //                        request = new ParameterRequestWrapper(request, parameterMap);
-                    }else{
-                        request = new MyRequest(request);
-                        Map<String, String[]> parameterMap = new HashMap(request.getParameterMap());
+                        }else{
+                            request = new MyRequest(request);
+                            Map<String, String[]> parameterMap = new HashMap(request.getParameterMap());
 //                        System.out.printf(parameterMap.toString());
-                        parameterMap.put("ip", new String[]{ip});
-                        parameterMap.put("serverName", new String[]{serverName});
-                        parameterMap.put("serverPort", new String[]{String.valueOf(serverPort)});
-                        parameterMap.put("uri", new String[]{uri});
-                        parameterMap.put("url", new String[]{url});
-                        parameterMap.put("schema", new String[]{schema});
-                        if (user != null) {
-                            parameterMap.put("user", new String[]{JSONObject.toJSONString(user)});
-                        }
+                            parameterMap.put("ip", new String[]{ip});
+                            parameterMap.put("serverName", new String[]{serverName});
+                            parameterMap.put("serverPort", new String[]{String.valueOf(serverPort)});
+                            parameterMap.put("uri", new String[]{uri});
+                            parameterMap.put("url", new String[]{url});
+                            parameterMap.put("schema", new String[]{schema});
+                            if (user != null) {
+                                parameterMap.put("user", new String[]{JSONObject.toJSONString(user)});
+                            }
 //                        System.out.println(parameterMap);
-                        request = new ParameterRequestWrapper(request, parameterMap);
+                            request = new ParameterRequestWrapper(request, parameterMap);
+                        }
                     }
                 }
             }

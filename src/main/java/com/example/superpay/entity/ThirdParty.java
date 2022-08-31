@@ -27,6 +27,7 @@ public class ThirdParty {
     private String errorUrl;
     private String secretKey;
     private String publicKey;
+    private String appid;
     private String typeId;
     private int third = 0;
     private int state=0;

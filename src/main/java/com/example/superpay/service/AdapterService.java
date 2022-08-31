@@ -7,10 +7,9 @@ import com.example.superpay.repository.OrderRepository;
 import com.example.superpay.repository.PayTypeRepository;
 import com.example.superpay.repository.ThirdPartyRepository;
 import com.example.superpay.repository.UserRepository;
-import com.example.superpay.util.AlipayUtil;
-import com.example.superpay.util.ThirdPartyUtil;
-import com.example.superpay.util.TimeUtil;
-import com.example.superpay.util.ToolsUtil;
+import com.example.superpay.util.*;
+import com.github.wxpay.sdk.WXPayUtil;
+import io.netty.handler.codec.base64.Base64Encoder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +21,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -104,10 +106,10 @@ public class AdapterService {
         order.setAddTime(System.currentTimeMillis());
         order.setUpdateTime(System.currentTimeMillis());
 
-        return handlerThirdParty(party, order, ePay.getType());
+        return handlerThirdParty(party, order, ePay.getType(),ePay.getIp());
     }
 
-    private ModelAndView handlerThirdParty(ThirdParty thirdParty, Order order, String type) {
+    private ModelAndView handlerThirdParty(ThirdParty thirdParty, Order order, String type,String ip) {
         switch (thirdParty.getThird()) {
             case PAY_TYPE_DEFAULT:
                 String url = ThirdPartyUtil.toPay(order, thirdParty);
@@ -118,7 +120,11 @@ public class AdapterService {
                 break;
             case PAY_TYPE_NATIVE:
                 if (type.equals("wxpay")){
-//
+                    String wxUrl = WxPayUtil.wxPayH5s(thirdParty,order,ip);
+                    if (wxUrl != null) {
+                        orderRepository.save(order);
+                        return ToolsUtil.getHtml(wxUrl);
+                    }
                 }else if (type.equals("alipay")){
                     String data = AlipayUtil.alipay(thirdParty,order);
                     if (data != null) {
@@ -154,19 +160,34 @@ public class AdapterService {
     }
 
     public EPayData test() {
-//        ThirdParty thirdParty = new ThirdParty();
-//        thirdParty.setThird(1);
-//        thirdParty.setAddTime(System.currentTimeMillis());
-//        thirdParty.setState(1);
-//        thirdParty.setTitle("支付宝原生");
-//        thirdParty.setMchId("2018031602385705");
-//        thirdParty.setSecretKey("MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCvTpNi61GjIhFrdRaPPyIlhHeZ3TPUkGvjoPKb2Yptwe8uy5YS8p6jnTohSJp0aIvA8SduBCZNfgzNq32bOXwWrdar3tPNQj0t62A7ucwFhxoMFMtnbzOjCIEKZWWC3L3J6WaNstchl35DL0RupVWOYJ5j27MfHch4IoLzanZxpRRzuLE3YMsvSL5tNES6rNqlPSfiAiPvLV7mWLByWDJJVW5+A5oFlfeFD2Ey0tzlEFslPvvVKhP0thByyEqn2d8//6rkieKjEM/BsFAXjl40RUWeUCRorS7o1TSZC9Hn9azjvOFF2sgOrsd5HG4Lhh9WxvblZ1AshwZxeNe/ZustAgMBAAECggEADlksDwibofKD4nuu4QKV1ORGtb05JMi9S+A8ey0O+3TIEthu7BYXjeSsgVTj72svJReX1pVYXTdX7O2AVlgaI/EOhPqz8zTctQly0vCeFkW8iAibrVeYrltf1G4AJPnUPtZvomFk4kb3+p+/xh6aJhEaZanxuzZA1jRc63dnQl3RjnvjSqcE7deawK096rMlBr82XoEWltoN6xpUuLqoJ/nwqS5EXd54fEDc4sTZgGHW1A5WOp/t1+UVfoG4C+0pl1uiC5eALl1rlzdx23IOEU5V4FAwTDNfb442B/i+U/FglQwQw62yPkz4J5e9xGuEVbvtPZmvtInbYRnXaIxFAQKBgQDzkb8AQ02ZK5+QE5no0M0YOrBB8DnFekTeuy7OjuhKml2NjVVNXDkEd+z6/2n/RfSBiFsgEOPMizRgAF0esByuESzjnvsXZ2BFZRlQ7Ni7+U6aPXnY8gdnkIvS/5V4F83yBqLBz3eC+GPajnUXSZwc1z1bnhx1m15rRNFX6cqBfQKBgQC4QPnMIZcg+54UkJVFlK5ULOCmrILUDiwLFxth1nxFe1MZfTxypQcfNexRyrZb8KfRsgZNf6M53dE6rgSJDK46tAPF+O6jPtvILwKdSXLvxGTb7pQ2ovPgBbz+CQH7SKDthypDXUMbR5VCmtyJJeK4LW/iOKTluV1MkomxvJ4/cQKBgER6EEHJqjJK4mRGLnoW4eJS9aTEHenYEy6vX1xxLvtyZKTcPEQwjlMkSDrUvf8nsrMMG9prBTBHXqUy1PtAtf92ErG3y43r4VQBNVncDJ7kW2XfrLcCbHSAXd8nPeVyg9LsbKuiYU4v+RrD/EVcy4gMN1Lfo86orKXpxhU6RFWdAoGAXDiZTqSZYfbOfniHXhY20wbLQmEh8kVNohdkqymRda1uQFnAgZk74VE6AQ43C/l95aT3Jp718aambHpg5r+kDNnA8bvQpYB2vNFau6LhlkR0PuhA4r/Y1I3KtFOJ3F3Tvk9ixejOB79iY73jF/oQaiLD1zSGxDxtCEBoDr/bbOECgYBQHaza5KpWbu1dNSfXe0hb15vWaRlawEWogqoBOwmcGe06wXnuy6IC26qKVo6oCWFABzHjMtNADxwEpTqxwoFqrRBHtPvc9fc7L3F1ARfa1Wq6lZBzdMEZ4ZfCyhFcFg5C+HrLtwjOH1o3GCdTtRG+WK8IstFPxK00pG3bBG7/ZA==");
-//        thirdParty.setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0h5BDdwC3b4rLJDuUwf7pRat3UT9EaJJUh41jYTiqKKsHHBWUiJo/znjqYRn9A5Lx76XtLXXyfEM4DxffqEzu1GTDb3BMc/mZDNXe94xqqAzvC2waMEgP7gzBW/SSNjV0cTLpRLuL34kvgG4mHcGQX9ea9Ux6Oo5jdzr7Da4bccNH2abznrzgB2w+qY21UHHt27JgA0XaRecTrSYABHf95dOWPIKyId03IDWJe58N51/jFm8Ku5r0KFZg4VdU/Cv2HVm2QEnmUyQJbLVo+yVJCBeTbT9epKakq+20LUNMmv+PwWyW8qw7XgP+8NlX7VLHlsbsJY2jKcfXpmeEBsRFQIDAQAB");
-//        thirdParty.setNotifyUrl("https://pay.telebott.com/v3api/alipayNotify");
-//        thirdParty.setCallbackUrl("https://pay.telebott.com/v3api/alipay");
-//        thirdParty.setTypeId("de12ad07CsHdf1ekeu4965KrRb08ec9F89088fa05746ciI");
-//        thirdParty.setRate(0.1);
-//        thirdPartyRepository.save(thirdParty);
+        ThirdParty thirdParty = new ThirdParty();
+        thirdParty.setThird(1);
+        thirdParty.setAddTime(System.currentTimeMillis());
+        thirdParty.setState(1);
+        thirdParty.setTitle("微信原生");
+        thirdParty.setMchId("1501179181");
+        thirdParty.setSecretKey("192006250b4c09247ec02edce69f6a2d");
+        thirdParty.setAppid("wx4fcd04bc73de65e1");
+        thirdParty.setNotifyUrl("https://pay.telebott.com/v3api/wxPayNotify");
+        thirdParty.setCallbackUrl("https://pay.telebott.com/v3api/callback?outTradeNo=");
+        thirdParty.setTypeId("a44c9e54ZB324b32yp4ddcIcq9ac4LMZaa3fd01f75e85j1");
+        thirdParty.setRate(0.1);
+//        try{
+//            String certPath = WXConfigUtil.class.getClassLoader().getResource("").getPath();
+//            File file = new File(certPath+ "apiclient_cert.p12");
+//            InputStream certStream = new FileInputStream(file);
+//            byte[] certData = new byte[(int) file.length()];
+//            certStream.read(certData);
+//            certStream.close();
+//            String certStr = Base64.getEncoder().encodeToString(certData);
+//            thirdParty.setPublicKey(certStr);
+//            thirdPartyRepository.save(thirdParty);
+////            System.out.println(certStr);
+////            byte[] temp = Base64.getDecoder().decode(certStr);
+////            System.out.printf("data: %d === temp: %d\n",certData.length,temp.length);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 //        PayType type = new PayType();
 //        type.setType("alipay");
 //        type.setAddTime(System.currentTimeMillis());
@@ -175,12 +196,13 @@ public class AdapterService {
 //        payTypeRepository.save(type);
         EPayData data = new EPayData();
         data.setPid(202206252104000L);
-        data.setType("alipay");
+        data.setType("wxpay");
         data.setOut_trade_no(TimeUtil._getOrderNo());
         data.setNotify_url("https://pay.telebott.com/v3api/ePayNotify");
         data.setReturn_url("https://pay.telebott.com/v3api/ePayReturn");
         data.setMoney("1.00");
         data.setSign(data.getSign("3gOVsdBIgJdDSvOVhd8IlNgSMv43yfEk"));
+        data.setIp("127.0.0.1");
         return data;
     }
 
@@ -509,5 +531,118 @@ public class AdapterService {
             e.printStackTrace();
         }
         return ToolsUtil.errorHtml("商户回调地址错误!");
+    }
+
+    public String wxPayNotify(HttpServletRequest request) {
+        try{
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream( )));
+            String line;
+            StringBuilder sb = new StringBuilder( );
+            while ((line = br.readLine( )) != null) {
+                sb.append(line);
+            }
+            if (StringUtils.isBlank(sb)) {
+                return "error";
+            }
+            //支付结果通知的xml格式数据
+            String notifyData = sb.toString();
+            Map< String, String > notifyMap = WXPayUtil.xmlToMap(notifyData);
+            if (!"SUCCESS".equals(notifyMap.get("result_code"))) return "error";
+            String out_trade_no = notifyMap.get("out_trade_no");
+            if (StringUtils.isEmpty(out_trade_no)) return "error";
+            String mch_id = notifyMap.get("mch_id");
+            if (StringUtils.isEmpty(mch_id)) return "error";
+            List<ThirdParty> thirdPartyList = thirdPartyRepository.findAllByMchId(mch_id);
+            if (thirdPartyList.size() == 0) return "error";
+            ThirdParty party = thirdPartyList.get(0);
+            if (!WxPayUtil.notifyUrl(party,notifyMap)) return "error";
+            Order order = orderRepository.findAllByOutTradeNo(out_trade_no);
+            User user = userRepository.findAllById(order.getUid());
+            if (order == null || user == null) return "error";
+            if (order.getState() == 1) {
+                return "success";
+            }
+            order.setUpdateTime(System.currentTimeMillis());
+            order.setState(1);
+            order.setNotifyState(0);
+            order.setTradeNo(notifyMap.get("transaction_id"));
+            order.setTotalFee(new Long(notifyMap.get("total_fee")) / 100D);
+            double fee = 0D;
+            Fee f = new Fee();
+            f.setAddTime(System.currentTimeMillis());
+            f.setUid(user.getId());
+            f.setOrderId(order.getId());
+            f.setTip("第三方通道手续费");
+            /**
+             * 扣除通道费
+             */
+            if (party.getRate() > 0) {
+                Double rate = party.getRate();
+                Double rateFee = 0D;
+                if (rate > 1) {
+                    if (rate < 100) {
+                        rateFee = ToolsUtil.getMoney(order.getTotalFee() * (rate / 100));
+                    } else {
+                        rateFee = order.getTotalFee();
+                    }
+                } else {
+                    rateFee = ToolsUtil.getMoney(order.getTotalFee() * rate);
+                }
+                fee = ToolsUtil.getMoney(rateFee);
+                f.setPartyFee(rateFee);
+            }
+            /**
+             * 扣除自定义费率
+             */
+            if (user.getRate() > 0) {
+                Double rate = user.getRate();
+                Double rateFee = 0D;
+                Double totalFee = order.getTotalFee() - fee;
+                if (rate > 1) {
+                    if (rate < 100) {
+                        rateFee = ToolsUtil.getMoney(order.getTotalFee() * (rate / 100));
+                        if (rateFee > totalFee) {
+                            rateFee = totalFee;
+                        }
+                    } else {
+                        rateFee = order.getTotalFee();
+                        if (rateFee > totalFee) {
+                            rateFee = totalFee;
+                        }
+                    }
+                } else {
+                    rateFee = ToolsUtil.getMoney(order.getTotalFee() * rate);
+                    if (rateFee > totalFee) {
+                        rateFee = totalFee;
+                    }
+                }
+                fee = fee + ToolsUtil.getMoney(rateFee);
+                f.setRateFee(ToolsUtil.getMoney(rateFee));
+            }
+            /**
+             * 扣除单笔手续费
+             */
+            if (user.getFee() > 0) {
+                Double totalFee = order.getTotalFee() - fee;
+                Double rateFee = 0D;
+                if (user.getFee() > totalFee) {
+                    rateFee = totalFee;
+                } else {
+                    rateFee = user.getFee();
+                }
+                fee = fee + ToolsUtil.getMoney(rateFee);
+                f.setSelfFee(ToolsUtil.getMoney(rateFee));
+            }
+            order.setFee(fee);
+            orderRepository.save(order);
+            if (f.isNotEmpty()) {
+                mongoTemplate.save(f);
+            }
+            handlerThirdPartyNotify(order);
+            return "success";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "error";
     }
 }

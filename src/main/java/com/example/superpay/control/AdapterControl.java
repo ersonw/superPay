@@ -31,4 +31,9 @@ public class AdapterControl {
     public String alipayNotify(@ModelAttribute AlipayNotifyParam param, HttpServletRequest req){
         return service.alipayNotify(param,req);
     }
+    @ApiIgnore
+    @PostMapping("/v3api/wxPayNotify")
+    public String wxPayNotify(HttpServletRequest request){
+        return service.wxPayNotify(request);
+    }
 }
