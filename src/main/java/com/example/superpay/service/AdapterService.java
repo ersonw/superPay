@@ -146,7 +146,7 @@ public class AdapterService {
                 String ePayData = EPayUtil.submit(thirdParty,order,type);
                 if (ePayData != null) {
                     orderRepository.save(order);
-                    System.out.println(ePayData);
+//                    System.out.println(ePayData);
                     return ToolsUtil.emptyHtml(ePayData);
                 }
                 break;
