@@ -19,15 +19,15 @@ public class Withdraw {
     @Id
     private String id;
     @Field("uid")
-    private String uid;
-    private String typeId;
-    private Double money;
-    private Double totalFee;
-    private Double fee;
-    private String name;
-    private String account;
-    private String remark;
+    private String uid=null;
+    private String typeId=null;
+    private Double money=0D;
+    private Double totalFee=0D;
+    private Double fee=0D;
+    private String name=null;
+    private String account=null;
+    private String remark=null;
     private int state = 0;
-    private long addTime;
-    private long updateTime;
+    private long addTime=0;
+    private long updateTime=0;
 }

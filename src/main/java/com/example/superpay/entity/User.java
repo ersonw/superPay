@@ -18,21 +18,21 @@ public class User {
     @Id
     private String id;
     @Field("pid")
-    private long pid;
+    private long pid=0;
     @Field("username")
-    private String username;
+    private String username=null;
     @Field("avatar")
-    private String avatar;
+    private String avatar=null;
     @Field("password")
-    private String password;
+    private String password=null;
     @Field("salt")
-    private String salt;
+    private String salt=null;
     @Field("secretKey")
-    private String secretKey;
+    private String secretKey=null;
     @Field("callbackUrl")
-    private String callbackUrl;
+    private String callbackUrl=null;
     @Field("notifyUrl")
-    private String notifyUrl;
+    private String notifyUrl=null;
     @Field("rate")
     private Double rate = 0D;
     @Field("fee")
@@ -40,7 +40,7 @@ public class User {
     @Field("state")
     private Integer state = 0;
     @Field("addTime")
-    private Long  addTime;
+    private Long  addTime=0L;
     @Field("updateTime")
     private Long updateTime = 0L;
     private boolean admin =false;

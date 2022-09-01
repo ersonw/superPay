@@ -25,6 +25,11 @@ public class AdapterControl {
     public String ePayNotify(@ModelAttribute EPayNotify ePayNotify){
         return service.ePayNotify(ePayNotify);
     }
+    @ApiIgnore
+    @GetMapping("/v3api/testNotify")
+    public String testNotify(@ModelAttribute EPayNotify ePayNotify){
+        return service.testNotify(ePayNotify);
+    }
 
     @ApiIgnore
     @PostMapping("/v3api/alipayNotify")

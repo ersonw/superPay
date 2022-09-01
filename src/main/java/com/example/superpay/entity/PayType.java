@@ -17,8 +17,8 @@ public class PayType {
     }
     @Id
     private String id;
-    private String name;
-    private String type;
-    private long addTime;
-    private long updateTime;
+    private String name=null;
+    private String type=null;
+    private long addTime=0L;
+    private long updateTime=0L;
 }

@@ -71,7 +71,7 @@ public class AdapterService {
         }
         PayType type = payTypeRepository.findAllByType(ePay.getType());
         if (type == null) {
-            return ToolsUtil.errorHtml("支付方式不存在或者未开放!");
+            return ToolsUtil.errorHtml("支付方式已被禁用!");
         }
         ThirdParty party = getThird(type.getId());
         if (party == null) {
@@ -110,7 +110,7 @@ public class AdapterService {
 
     private ModelAndView handlerThirdParty(ThirdParty thirdParty, Order order, String type,String ip) {
         String domain = thirdParty.getDomain();
-        if (!domain.startsWith("http")){
+        if (StringUtils.isNotEmpty(domain) && !domain.startsWith("http")){
             domain = "http://" + domain;
         }
         switch (thirdParty.getThird()) {
@@ -134,14 +134,21 @@ public class AdapterService {
                     String data = AlipayUtil.alipay(thirdParty,order);
                     if (data != null) {
                         orderRepository.save(order);
-                        ShortLink aliLink = new ShortLink(data);
-                        shortLinkRepository.save(aliLink);
-                        return ToolsUtil.getHtml(domain+"/s/"+aliLink.getId());
-//                        return ToolsUtil.emptyHtml(data);
+//                        ShortLink aliLink = new ShortLink(data);
+//                        shortLinkRepository.save(aliLink);
+//                        return ToolsUtil.getHtml(domain+"/s/"+aliLink.getId());
+//                        System.out.println(data);
+                        return ToolsUtil.emptyHtml(data);
                     }
                 }
                 break;
             case PAY_TYPE_EPAY:
+                String ePayData = EPayUtil.submit(thirdParty,order,type);
+                if (ePayData != null) {
+                    orderRepository.save(order);
+                    System.out.println(ePayData);
+                    return ToolsUtil.emptyHtml(ePayData);
+                }
                 break;
             default:
                 break;
@@ -172,13 +179,13 @@ public class AdapterService {
         thirdParty.setThird(1);
         thirdParty.setAddTime(System.currentTimeMillis());
         thirdParty.setState(1);
-        thirdParty.setTitle("微信原生");
-        thirdParty.setMchId("1501179181");
-        thirdParty.setSecretKey("192006250b4c09247ec02edce69f6a2d");
-        thirdParty.setAppid("wx4fcd04bc73de65e1");
-        thirdParty.setNotifyUrl("https://pay.telebott.com/v3api/wxPayNotify");
-        thirdParty.setCallbackUrl("https://pay.telebott.com/v3api/callback?outTradeNo=");
-        thirdParty.setTypeId("a44c9e54ZB324b32yp4ddcIcq9ac4LMZaa3fd01f75e85j1");
+        thirdParty.setTitle("易支付宝");
+        thirdParty.setMchId("202206252104000");
+        thirdParty.setSecretKey("3gOVsdBIgJdDSvOVhd8IlNgSMv43yfEk");
+//        thirdParty.setAppid("wx4fcd04bc73de65e1");
+        thirdParty.setNotifyUrl("https://pay.telebott.com/v3api/ePayNotify");
+        thirdParty.setCallbackUrl("https://pay.telebott.com/v3api/ePayReturn");
+        thirdParty.setTypeId("de12ad07CsHdf1ekeu4965KrRb08ec9F89088fa05746ciI");
         thirdParty.setRate(0.1);
 //        try{
 //            String certPath = WXConfigUtil.class.getClassLoader().getResource("").getPath();
@@ -196,6 +203,7 @@ public class AdapterService {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
+//        thirdPartyRepository.save(thirdParty);
 //        PayType type = new PayType();
 //        type.setType("alipay");
 //        type.setAddTime(System.currentTimeMillis());
@@ -204,10 +212,10 @@ public class AdapterService {
 //        payTypeRepository.save(type);
         EPayData data = new EPayData();
         data.setPid(202206252104000L);
-        data.setType("wxpay");
+        data.setType("alipay");
         data.setOut_trade_no(TimeUtil._getOrderNo());
-        data.setNotify_url("https://pay.telebott.com/v3api/ePayNotify");
-        data.setReturn_url("https://pay.telebott.com/v3api/ePayReturn");
+        data.setNotify_url("https://pay.telebott.com/v3api/testNotify");
+        data.setReturn_url("https://pay.telebott.com/v3api/testReturn");
         data.setMoney("1.00");
         data.setSign(data.getSign("3gOVsdBIgJdDSvOVhd8IlNgSMv43yfEk"));
         data.setIp("127.0.0.1");
@@ -391,6 +399,139 @@ public class AdapterService {
     public String ePayNotify(EPayNotify ePayNotify) {
         System.out.printf("%s\n", ePayNotify);
         if (ePayNotify.getPid() == 0) return "error";
+        List<ThirdParty> partys = thirdPartyRepository.findAllByMchId(ePayNotify.getPid().toString());
+        if (partys.isEmpty()) {
+            return "error";
+        }
+        ThirdParty party = partys.get(0);
+        if(!ePayNotify.isSign(party.getSecretKey())) return "error";
+        Order order = orderRepository.findAllByOutTradeNo(ePayNotify.getOut_trade_no());
+        if (order == null) {
+            return "error";
+        }
+        User user = userRepository.findAllById(order.getUid());
+        if (user == null) {
+            return "error";
+        }
+        if (order.getState() == 1) {
+            return "success";
+        }
+        order.setUpdateTime(System.currentTimeMillis());
+        order.setState(1);
+        order.setNotifyState(0);
+        order.setTradeNo(ePayNotify.getTrade_no());
+        order.setTotalFee(new BigDecimal(String.valueOf(ePayNotify.getMoney())).doubleValue());
+        double fee = 0D;
+        Fee f = new Fee();
+        f.setAddTime(System.currentTimeMillis());
+        f.setUid(user.getId());
+        f.setOrderId(order.getId());
+        f.setTip("第三方通道手续费");
+        /**
+         * 扣除通道费
+         */
+        if (party.getRate() > 0) {
+            Double rate = party.getRate();
+            Double rateFee = 0D;
+            if (rate > 1) {
+                if (rate < 100) {
+                    rateFee = ToolsUtil.getMoney(order.getTotalFee() * (rate / 100));
+                } else {
+                    rateFee = order.getTotalFee();
+                }
+            } else {
+                rateFee = ToolsUtil.getMoney(order.getTotalFee() * rate);
+            }
+            fee = ToolsUtil.getMoney(rateFee);
+            f.setPartyFee(rateFee);
+        }
+        /**
+         * 扣除自定义费率
+         */
+        if (user.getRate() > 0) {
+            Double rate = user.getRate();
+            Double rateFee = 0D;
+            Double totalFee = order.getTotalFee() - fee;
+            if (rate > 1) {
+                if (rate < 100) {
+                    rateFee = ToolsUtil.getMoney(order.getTotalFee() * (rate / 100));
+                    if (rateFee > totalFee) {
+                        rateFee = totalFee;
+                    }
+                } else {
+                    rateFee = order.getTotalFee();
+                    if (rateFee > totalFee) {
+                        rateFee = totalFee;
+                    }
+                }
+            } else {
+                rateFee = ToolsUtil.getMoney(order.getTotalFee() * rate);
+                if (rateFee > totalFee) {
+                    rateFee = totalFee;
+                }
+            }
+            fee = fee + ToolsUtil.getMoney(rateFee);
+            f.setRateFee(ToolsUtil.getMoney(rateFee));
+        }
+        /**
+         * 扣除单笔手续费
+         */
+        if (user.getFee() > 0) {
+            Double totalFee = order.getTotalFee() - fee;
+            Double rateFee = 0D;
+            if (user.getFee() > totalFee) {
+                rateFee = totalFee;
+            } else {
+                rateFee = user.getFee();
+            }
+            fee = fee + ToolsUtil.getMoney(rateFee);
+            f.setSelfFee(ToolsUtil.getMoney(rateFee));
+        }
+        order.setFee(fee);
+        orderRepository.save(order);
+        if (f.isNotEmpty()) {
+            mongoTemplate.save(f);
+        }
+        handlerThirdPartyNotify(order);
+        return "success";
+    }
+    public ModelAndView ePayReturn(EPayNotify ePayNotify) {
+        if (ePayNotify.getPid() == 0) return ToolsUtil.errorHtml("商户不存在!");
+        List<ThirdParty> partys = thirdPartyRepository.findAllByMchId(ePayNotify.getPid().toString());
+        if(partys.size() == 0) return ToolsUtil.errorHtml("商户不存在！");
+        ThirdParty party = partys.get(0);
+        if(!ePayNotify.isSign(party.getSecretKey())) return ToolsUtil.errorHtml("效验失败");
+        Order order = orderRepository.findAllByOutTradeNo(ePayNotify.getOut_trade_no());
+        if (order == null) {
+            return ToolsUtil.errorHtml("订单号不存在!");
+        }
+        User user = userRepository.findAllById(order.getUid());
+        if (user == null) {
+            return ToolsUtil.errorHtml("商户不存在!");
+        }
+        if (order.getState() == 0) {
+            return ToolsUtil.waitHtml();
+        }
+        String url = order.getReturnUrl();
+        EPayNotify notify = getEPayNotify(order, user);
+        try {
+            URL u = new URL(url);
+            if (StringUtils.isNotEmpty(u.getQuery())) {
+                url = url + "&";
+            } else {
+                url = url + "?";
+            }
+            return ToolsUtil.getHtml(url + EPayNotify.getParameter(notify));
+        } catch (MalformedURLException e) {
+//            throw new RuntimeException(e);
+            e.printStackTrace();
+        }
+        return ToolsUtil.errorHtml("商户回调地址错误!");
+    }
+
+    public String testNotify(EPayNotify ePayNotify) {
+        System.out.printf("%s\n", ePayNotify);
+        if (ePayNotify.getPid() == 0) return "error";
         User user = userRepository.findAllByPid(ePayNotify.getPid());
         boolean verify = ePayNotify.isSign(user.getSecretKey());
         System.out.printf(verify ? "效验成功！\n" : "效验失败!\n");
@@ -399,8 +540,7 @@ public class AdapterService {
         }
         return "error";
     }
-
-    public ModelAndView ePayReturn(EPayNotify ePayNotify) {
+    public ModelAndView testReturn(EPayNotify ePayNotify) {
         if (ePayNotify.getPid() == 0) return ToolsUtil.errorHtml("商户不存在!");
         User user = userRepository.findAllByPid(ePayNotify.getPid());
         return ToolsUtil.errorHtml(ePayNotify.isSign(user.getSecretKey()) ? "效验成功！" : "效验失败!");

@@ -16,11 +16,11 @@ public class Login {
     @Id
     private String id;
     @Field("uid")
-    private String uid;
+    private String uid=null;
     @Field("ip")
-    private String ip;
+    private String ip=null;
     @Field("addTime")
-    private long addTime;
+    private long addTime=0L;
     public Login(){
         this.id = ToolsUtil.getToken();
     }

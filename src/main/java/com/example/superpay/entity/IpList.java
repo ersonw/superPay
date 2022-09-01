@@ -25,8 +25,8 @@ public class IpList {
     @Id
     private String id;
     @Field("uid")
-    private String uid;
-    private String address;
-    private long addTime;
+    private String uid=null;
+    private String address=null;
+    private long addTime=0L;
     private long updateTime=0L;
 }

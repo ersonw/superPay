@@ -19,11 +19,11 @@ public class WithdrawType {
     @Id
     private String id;
     @Field("title")
-    private String title;
-    private Double rate;
-    private Double mini;
-    private Double max;
-    private int state;
-    private long addTime;
-    private long updateTime;
+    private String title=null;
+    private Double rate=0D;
+    private Double mini=0D;
+    private Double max=0D;
+    private int state=0;
+    private long addTime=0;
+    private long updateTime=0;
 }

@@ -40,6 +40,12 @@ public class CallbackControl {
         return service.ePayReturn(ePayNotify);
     }
     @ApiIgnore
+    @GetMapping("/v3api/testReturn")
+    public ModelAndView testReturn(@ModelAttribute EPayNotify ePayNotify){
+//        System.out.printf(ePayNotify+"\n");
+        return service.testReturn(ePayNotify);
+    }
+    @ApiIgnore
     @GetMapping("/v3api/callback")
 //    public ModelAndView sCallback(@ModelAttribute JSONObject jsonObject){
     public ModelAndView sCallback(@RequestParam(value = "outTradeNo") String out_trade_no,

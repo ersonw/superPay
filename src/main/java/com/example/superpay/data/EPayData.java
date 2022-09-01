@@ -77,6 +77,21 @@ public class EPayData {
         }
         return json;
     }
+    public static JSONObject getObject(EPayData data){
+        JSONObject object = JSONObject.parseObject(JSONObject.toJSONString(data));
+        JSONObject json = new JSONObject();
+        for (Map.Entry<String, Object> entry: object.entrySet()) {
+            if (StringUtils.isNotEmpty(entry.getValue().toString()) &&
+                    !entry.getKey().equals("sign") &&
+                    !entry.getKey().equals("sign_type") &&
+//                    !entry.getKey().equals("name") &&
+//                    !entry.getKey().equals("sitename") &&
+                    !entry.getKey().equals("ip")){
+                json.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return json;
+    }
     public String getSign(String key) {
         return ToolsUtil.md5(StringEscapeUtils.unescapeJava(this.toString()) + key);
 //        if (this.getSign_type().equalsIgnoreCase("MD5")){

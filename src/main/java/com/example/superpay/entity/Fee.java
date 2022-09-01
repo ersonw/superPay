@@ -19,13 +19,13 @@ public class Fee {
     @Id
     private String id;
     @Field("uid")
-    private String uid;
-    private String orderId;
-    private String tip;
+    private String uid=null;
+    private String orderId=null;
+    private String tip=null;
     private Double partyFee=0D;
     private Double rateFee=0D;
     private Double selfFee=0D;
-    private long addTime;
+    private long addTime=0L;
 
     public boolean isNotEmpty(){
         if(this.partyFee >0 || this.rateFee>0 || this.selfFee > 0) return true;

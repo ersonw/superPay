@@ -19,19 +19,19 @@ public class ThirdParty {
     @Id
     private String id;
     @Field("title")
-    private String title;
-    private String domain;
-    private String mchId;
-    private String callbackUrl;
-    private String notifyUrl;
-    private String errorUrl;
-    private String secretKey;
-    private String publicKey;
-    private String appid;
-    private String typeId;
+    private String title=null;
+    private String domain=null;
+    private String mchId=null;
+    private String callbackUrl=null;
+    private String notifyUrl=null;
+    private String errorUrl=null;
+    private String secretKey=null;
+    private String publicKey=null;
+    private String appid=null;
+    private String typeId=null;
     private int third = 0;
     private int state=0;
-    private Double rate;
-    private long addTime;
-    private long updateTime;
+    private Double rate=0D;
+    private long addTime=0L;
+    private long updateTime=0L;
 }

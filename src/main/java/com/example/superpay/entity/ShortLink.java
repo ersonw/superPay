@@ -22,6 +22,6 @@ public class ShortLink {
     }
     @Id
     private String id;
-    private String link;
-    private long addTime;
+    private String link=null;
+    private long addTime=0L;
 }

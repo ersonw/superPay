@@ -15,15 +15,15 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Order {
     @Id
     private String id;
-    private String uid;
-    private String orderId;
-    private String tradeNo;
-    private String outTradeNo;
-    private String thirdPartyId;
-    private String ip;
-    private String returnUrl;
-    private String notifyUrl;
-    private String name;
+    private String uid=null;
+    private String orderId=null;
+    private String tradeNo=null;
+    private String outTradeNo=null;
+    private String thirdPartyId=null;
+    private String ip=null;
+    private String returnUrl=null;
+    private String notifyUrl=null;
+    private String name=null;
     private Double money=0D;
     private Double totalFee=0D;
     private Double fee=0D;

@@ -27,7 +27,7 @@ public class AlipayUtil {
         }
         AlipayConfig.return_url = thirdParty.getCallbackUrl();
         AlipayConfig.notify_url = thirdParty.getNotifyUrl();
-        return AlipayUtil.alipay(order.getOutTradeNo(),order.getMoney().toString(),order.getOutTradeNo(),"生活服务");
+        return alipay(order.getOutTradeNo(),order.getMoney().toString(),order.getOutTradeNo(),"生活服务");
     }
     /**
      * @Title: alipay
