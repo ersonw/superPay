@@ -3,10 +3,7 @@ package com.example.superpay.service;
 import com.alibaba.fastjson.JSONObject;
 import com.example.superpay.data.*;
 import com.example.superpay.entity.*;
-import com.example.superpay.repository.OrderRepository;
-import com.example.superpay.repository.PayTypeRepository;
-import com.example.superpay.repository.ThirdPartyRepository;
-import com.example.superpay.repository.UserRepository;
+import com.example.superpay.repository.*;
 import com.example.superpay.util.*;
 import com.github.wxpay.sdk.WXPayUtil;
 import io.netty.handler.codec.base64.Base64Encoder;
@@ -46,6 +43,8 @@ public class AdapterService {
     private PayTypeRepository payTypeRepository;
     @Autowired
     private ThirdPartyRepository thirdPartyRepository;
+    @Autowired
+    private ShortLinkRepository shortLinkRepository;
 
     public ModelAndView ePayOrder(EPayData ePay) {
 //        System.out.printf(JSONObject.toJSONString(ePay));
@@ -110,6 +109,10 @@ public class AdapterService {
     }
 
     private ModelAndView handlerThirdParty(ThirdParty thirdParty, Order order, String type,String ip) {
+        String domain = thirdParty.getDomain();
+        if (!domain.startsWith("http")){
+            domain = "http://" + domain;
+        }
         switch (thirdParty.getThird()) {
             case PAY_TYPE_DEFAULT:
                 String url = ThirdPartyUtil.toPay(order, thirdParty);
@@ -123,13 +126,18 @@ public class AdapterService {
                     String wxUrl = WxPayUtil.wxPayH5s(thirdParty,order,ip);
                     if (wxUrl != null) {
                         orderRepository.save(order);
-                        return ToolsUtil.getHtml(wxUrl);
+                        ShortLink wxLink = new ShortLink(wxUrl);
+                        shortLinkRepository.save(wxLink);
+                        return ToolsUtil.getHtml(domain+"/s/"+wxLink.getId());
                     }
                 }else if (type.equals("alipay")){
                     String data = AlipayUtil.alipay(thirdParty,order);
                     if (data != null) {
                         orderRepository.save(order);
-                        return ToolsUtil.emptyHtml(data);
+                        ShortLink aliLink = new ShortLink(data);
+                        shortLinkRepository.save(aliLink);
+                        return ToolsUtil.getHtml(domain+"/s/"+aliLink.getId());
+//                        return ToolsUtil.emptyHtml(data);
                     }
                 }
                 break;

@@ -22,7 +22,7 @@ import java.util.Map;
 
 //@Order(10000)
 //@Component
-@WebFilter(filterName = "myFilter", urlPatterns = {"/api/*", "/v3api/*"})
+@WebFilter(filterName = "myFilter", urlPatterns = {"/api/*", "/v3api/*","/s/*"})
 public class MyFilter implements Filter {
 //    private static MyFilter self;
 //    @Autowired

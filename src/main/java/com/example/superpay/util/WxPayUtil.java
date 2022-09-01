@@ -54,7 +54,7 @@ public class WxPayUtil {
 
             Map< String, String > map = wxPay.unifiedOrder(reqData);
             if(map.get("return_code").equals("FAIL")) return null;
-            System.out.println(map);
+//            System.out.println(map);
             String mWebUrl = map.get("mweb_url");
             //把成功后的跳转页面进行urlencoding转码 https://www.sojson.com/encodeurl.html
             String redirectUrl = thirdParty.getCallbackUrl()+order.getOutTradeNo();

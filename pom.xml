@@ -22,6 +22,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
@@ -147,22 +152,39 @@
 			<artifactId>weixin-java-pay</artifactId>
 			<version>4.1.0</version>
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.data</groupId>-->
+<!--			<artifactId>spring-data-jpa</artifactId>-->
+<!--			<version>2.6.6</version>-->
+<!--		</dependency>-->
 	</dependencies>
 
 	<build>
 		<plugins>
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-compiler-plugin</artifactId>-->
-<!--				<configuration>-->
-<!--					<source>1.8</source>-->
-<!--					<target>1.8</target>-->
-<!--				</configuration>-->
-<!--			</plugin>-->
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-jar-plugin</artifactId>-->
-<!--			</plugin>-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.3.2</version>
+				<configuration>
+					<webResources>
+						<resource>
+							<directory>src/main/res</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+							<targetPath>WEB-INF/classes/</targetPath>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
