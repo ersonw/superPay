@@ -227,7 +227,7 @@ public class AdapterService {
     }
 
     public ModelAndView sCallback(String out_trade_no, String ip) {
-        System.out.printf("test out_trade_no:" + out_trade_no + " ip:" + ip + "\n");
+//        System.out.printf("test out_trade_no:" + out_trade_no + " ip:" + ip + "\n");
         Order order = orderRepository.findAllByOutTradeNo(out_trade_no);
         if (order == null) {
             return ToolsUtil.errorHtml("订单号不存在!");
@@ -257,7 +257,7 @@ public class AdapterService {
     }
 
     public String sNotify(ToPayNotify toPayNotify) {
-        System.out.printf("toPayNotify:", toPayNotify + "\n");
+//        System.out.printf("toPayNotify:", toPayNotify + "\n");
         List<ThirdParty> partys = thirdPartyRepository.findAllByMchId(toPayNotify.getMchid());
         if (partys.isEmpty()) {
             return "error";
