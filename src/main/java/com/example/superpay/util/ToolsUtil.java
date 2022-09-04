@@ -121,6 +121,26 @@ public class ToolsUtil {
 //        post.addObject("url",url);
         return post;
     }
+    public static ModelAndView refreshHtml(Map<String, ?> modelMap){
+        ModelAndView post = new ModelAndView("payHtml/refresh");
+        post.addAllObjects(modelMap);
+        return post;
+    }
+    public static ModelAndView wxpayHtml(Map<String, ?> modelMap){
+        ModelAndView post = new ModelAndView("payHtml/wxpay");
+        post.addAllObjects(modelMap);
+        return post;
+    }
+    public static ModelAndView alipayHtml(Map<String, ?> modelMap){
+        ModelAndView post = new ModelAndView("payHtml/alipay");
+        post.addAllObjects(modelMap);
+        return post;
+    }
+    public static ModelAndView waitHtml(Map<String, ?> modelMap){
+        ModelAndView post = new ModelAndView("payHtml/wait_h5");
+        post.addAllObjects(modelMap);
+        return post;
+    }
     private static boolean isNotRes(String str){
         List<String> parts = new ArrayList<>();
         parts.add(".js");

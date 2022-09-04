@@ -23,6 +23,7 @@ public class Order {
     private String ip=null;
     private String returnUrl=null;
     private String notifyUrl=null;
+    private String qrcode=null;
     private String name=null;
     private Double money=0D;
     private Double totalFee=0D;

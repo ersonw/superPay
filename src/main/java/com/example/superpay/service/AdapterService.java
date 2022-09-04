@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -122,23 +123,41 @@ public class AdapterService {
                 }
                 break;
             case PAY_TYPE_NATIVE:
-                if (type.equals("wxpay")){
-                    String wxUrl = WxPayUtil.wxPayH5s(thirdParty,order,ip);
-                    if (wxUrl != null) {
-                        orderRepository.save(order);
-                        ShortLink wxLink = new ShortLink(wxUrl);
-                        shortLinkRepository.save(wxLink);
-                        return ToolsUtil.getHtml(domain+"/s/"+wxLink.getId());
+                if (thirdParty.isQrcode()){
+                    if (type.equals("wxpay")){
+                        String wxUrl = WxPayUtil.wxNative(thirdParty,order,ip);
+                        if (wxUrl != null) {
+                            order.setQrcode(wxUrl);
+                            orderRepository.save(order);
+                            return ToolsUtil.getHtml("/v3api/callback?outTradeNo=" + order.getOutTradeNo());
+                        }
+                    }else if (type.equals("alipay")){
+                        String data = AlipayUtil.alipayNative(thirdParty,order);
+                        if (data != null) {
+                            order.setQrcode(data);
+                            orderRepository.save(order);
+                            return ToolsUtil.getHtml("/v3api/callback?outTradeNo=" + order.getOutTradeNo());
+                        }
                     }
-                }else if (type.equals("alipay")){
-                    String data = AlipayUtil.alipay(thirdParty,order);
-                    if (data != null) {
-                        orderRepository.save(order);
+                }else {
+                    if (type.equals("wxpay")){
+                        String wxUrl = WxPayUtil.wxPayH5s(thirdParty,order,ip);
+                        if (wxUrl != null) {
+                            orderRepository.save(order);
+                            ShortLink wxLink = new ShortLink(wxUrl);
+                            shortLinkRepository.save(wxLink);
+                            return ToolsUtil.getHtml(domain+"/s/"+wxLink.getId());
+                        }
+                    }else if (type.equals("alipay")){
+                        String data = AlipayUtil.alipay(thirdParty,order);
+                        if (data != null) {
+                            orderRepository.save(order);
 //                        ShortLink aliLink = new ShortLink(data);
 //                        shortLinkRepository.save(aliLink);
 //                        return ToolsUtil.getHtml(domain+"/s/"+aliLink.getId());
 //                        System.out.println(data);
-                        return ToolsUtil.emptyHtml(data);
+                            return ToolsUtil.emptyHtml(data);
+                        }
                     }
                 }
                 break;
@@ -237,7 +256,27 @@ public class AdapterService {
             return ToolsUtil.errorHtml("商户不存在!");
         }
         if (order.getState() == 0) {
-            return ToolsUtil.waitHtml();
+            Map<String, Object>  object = new HashMap<>();
+            object.put("url", order.getQrcode());
+            object.put("out_trade_no", out_trade_no);
+            object.put("money", "￥"+order.getMoney());
+            object.put("time", TimeUtil.getDateTime(order.getAddTime()));
+            ThirdParty party = thirdPartyRepository.findAllById(order.getThirdPartyId());
+            if (party != null){
+                    PayType type = payTypeRepository.findAllById(party.getTypeId());
+//                PayType type = payTypeRepository.findAllByType(party.getTypeId());
+                if (type!= null) {
+                    object.put("name", type.getName());
+                    if(StringUtils.isNotEmpty(order.getQrcode())){
+                        if (type.getType().equals("alipay")){
+                            return ToolsUtil.alipayHtml(object);
+                        }else if (type.getType().equals("wxpay")){
+                            return ToolsUtil.wxpayHtml(object);
+                        }
+                    }
+                }
+            }
+            return ToolsUtil.refreshHtml(object);
         }
         String url = order.getReturnUrl();
         EPayNotify notify = getEPayNotify(order, user);
@@ -552,19 +591,26 @@ public class AdapterService {
 
         List<ThirdParty> partys = thirdPartyRepository.findAllByMchId(param.getApp_id());
         if (partys.isEmpty()) {
+//            System.out.println("party return");
             return "error";
         }
         ThirdParty party = partys.get(0);
-        if(!AlipayUtil.checkSign(req, party)) return "error";
+        if(!AlipayUtil.checkSign(req, party)) {
+//            System.out.println("checkSign return");
+            return "error";
+        }
         Order order = orderRepository.findAllByOutTradeNo(param.getOut_trade_no());
         if (order == null) {
+//            System.out.println("order return");
             return "error";
         }
         User user = userRepository.findAllById(order.getUid());
         if (user == null) {
+//            System.out.println("User return");
             return "error";
         }
         if (order.getState() == 1) {
+//            System.out.println("getState return");
             return "success";
         }
         order.setUpdateTime(System.currentTimeMillis());
@@ -644,6 +690,7 @@ public class AdapterService {
             mongoTemplate.save(f);
         }
         handlerThirdPartyNotify(order);
+//        System.out.println("success return");
         return "success";
     }
 

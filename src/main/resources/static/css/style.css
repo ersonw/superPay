@@ -1,0 +1,153 @@
+a{
+    color: white;
+    text-decoration: none;
+}
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 9999;
+    background-color: #d8d8d817;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title {
+
+    width: 95%;
+    height: 35rem;
+    background-color: #fff;
+
+}
+
+.title_1 {
+    width: 100%;
+    height: 70%;
+}
+
+.title_2 {
+    width: 98%;
+    height: 20%;
+    margin: 3.5rem auto 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.title_2_1 {
+    width: 90%;
+    height: 10rem;
+    /* background-color: #2E2EFE; */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title_2_1 span {
+    font-size: 0.3rem;
+}
+
+.title_wx {
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    /* background-color: aqua; */
+}
+
+.title_wx img {
+    width: 30px;
+    height: 30px;
+}
+
+.title_wx span {
+    font-size: 20px;
+    margin-left: 12px;
+}
+
+.title_pay {
+    width: 100%;
+    height: 2.5rem;
+    /* background-color: bisque; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.title_qcode {
+    width: 100%;
+    height: 14rem;
+    /* background-color: blue; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title_qcode canvas {
+    width: 14rem;
+    height: 14rem;
+}
+
+.title_tishi {
+    height: 1.5rem;
+    /* background-color: aqua; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: #d8d8d8;
+}
+
+.title_tishi span {
+    font-size: 12px;
+}
+
+.title_tijiao {
+    width: 90%;
+    height: 6rem;
+    /* background-color: blueviolet; */
+    margin: 15px auto 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.title_tijiao_1 {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.title_tijiao_2 {
+    width: 100%;
+    height: 3rem;
+    text-align: center;
+    line-height: 3rem;
+    background-color: #80aafd;
+    color: #fff;
+}
+
+.title_anniu {
+    width: 40%;
+    height: 3rem;
+    text-align: center;
+    line-height: 3rem;
+    color: #fff;
+}

@@ -4,7 +4,9 @@ package com.example.superpay.util;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.Calendar;
@@ -167,5 +169,11 @@ public class TimeUtil {
     public static String _getOrderNo(){
         LocalDateTime ld = LocalDateTime.now();
         return format(ld,"yyyyMMddHHmmssSSS");
+    }
+    public static String getWxTimeExpire(long time){
+        Instant instant = Instant.ofEpochMilli(time);
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime ld = LocalDateTime.ofInstant(instant,zoneId);
+        return format(ld,"yyyyMMddHHmmss");
     }
 }

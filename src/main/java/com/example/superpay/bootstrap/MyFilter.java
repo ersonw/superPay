@@ -17,8 +17,10 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 //@Order(10000)
 //@Component
@@ -34,6 +36,7 @@ public class MyFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         authDao = Utils.getAuthDao();
         userDao = Utils.getUserRepository();
+        TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.of("+8")));
 //        self = this;
 //        System.out.printf(this.userDao.findAllById("9MjfGvQ0mhXS4JFjAl2owcGdUpXAh3He").toString());
 //        System.out.printf(JSONObject.toJSONString(filterConfig));

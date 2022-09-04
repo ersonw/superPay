@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Language" content="zh-cn">
+    <meta name="renderer" content="webkit">
+    <title>支付宝扫码支付</title>
+    <link href="/static/css/alipay_pay.css" rel="stylesheet" media="screen">
+</head>
+<body>
+<div class="body">
+    <h1 class="mod-title">
+        <span class="ico-wechat"></span><span class="text">支付宝扫码支付</span>
+    </h1>
+    <div class="mod-ct">
+        <div class="order">
+        </div>
+        <div class="amount" th:text="${ money }">￥</div>
+        <div class="qr-image" id="qrcode" th:data="${url}">
+        </div>
+        <div class="detail" id="orderDetail">
+            <dl class="detail-ct" style="display: none;">
+                <!--                <dt>购买物品</dt>-->
+                <!--                <dd id="productName">{name}</dd>-->
+                <dt>商户订单号</dt>
+                <dd id="billId" th:text="${ out_trade_no }"></dd>
+                <dt>创建时间</dt>
+                <dd id="createTime" th:text="${ time }"></dd>
+            </dl>
+            <a href="javascript:void(0)" class="arrow"><i class="ico-arrow"></i></a>
+        </div>
+        <div class="tip">
+            <span class="dec dec-left"></span>
+            <span class="dec dec-right"></span>
+            <div class="ico-scan"></div>
+            <div class="tip-text">
+                <p>请使用支付宝扫一扫</p>
+                <p>扫描二维码完成支付</p>
+            </div>
+        </div>
+        <div class="tip-text">
+        </div>
+    </div>
+</div>
+<meta http-equiv="refresh" content="6;url=">
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/layer.min.js"></script>
+<script src="/static/js/jquery.qrcode.min.js"></script>
+<script>
+    var code_url = window.document.getElementById('qrcode').getAttribute("data");
+    $('#qrcode').qrcode({
+        text: code_url,
+        width: 230,
+        height: 230,
+        foreground: "#000000",
+        background: "#ffffff",
+        typeNumber: -1
+    });
+    $('#orderDetail .arrow').click(function (event) {
+        if ($('#orderDetail').hasClass('detail-open')) {
+            $('#orderDetail .detail-ct').slideUp(500, function () {
+                $('#orderDetail').removeClass('detail-open');
+            });
+        } else {
+            $('#orderDetail .detail-ct').slideDown(500, function () {
+                $('#orderDetail').addClass('detail-open');
+            });
+        }
+    });
+</script>
+</body>
+</html>

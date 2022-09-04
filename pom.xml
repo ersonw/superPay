@@ -176,7 +176,7 @@
 				<configuration>
 					<webResources>
 						<resource>
-							<directory>src/main/res</directory>
+							<directory>src/main/resources</directory>
 							<includes>
 								<include>**/*</include>
 							</includes>

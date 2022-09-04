@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${name}"></title>
+    <link rel="shortcut icon" href="/static/images/wxpay.ico">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="title" style="height: 30rem;">
+    <div class="title_1" style="height: 50%">
+        <div class="title_wx">
+<!--            <img src="/static/images/wx.png" />-->
+            <span th:text="${name}"></span>
+        </div>
+        <div class="title_pay" style="height:7rem">
+            <span style="font-size: 35px;" th:text="${ money }"></span>
+        </div>
+        <div class="title_tishi">
+            <span>支付正在进行中,正在等待支付成功结果，请耐心等待</span>
+        </div>
+<!--        <div class="title_tijiao" style="height:10rem">-->
+<!--            <a th:href="${url}" disabled><div class="title_tijiao_2" disabled>立即支付</div></a>-->
+<!--        </div>-->
+    </div>
+    <div class="title_2">
+        <!--        <div class="title_2_1">-->
+        <!--            <span>购买产品</span>-->
+        <!--            <span>{name}</span>-->
+        <!--        </div>-->
+        <div class="title_2_1">
+            <span>商户订单号</span>
+            <span th:text="${ out_trade_no }"></span>
+        </div>
+        <div class="title_2_1">
+            <span>创建时间</span>
+            <span th:text="${ time }"></span>
+        </div>
+    </div>
+    <meta http-equiv="refresh" content="6;url=">
+</div>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/layer.min.js"></script>
+<script src="/static/js/startLoading.js"></script>
+<script>
+    window.onload = function(){
+        var obj = {
+            title:"请稍候",
+            tips:"正在等待支付结果..."
+        };
+        startLoading(obj);
+        // window.location.href = window.document.getElementById('qrcode').getAttribute("data");
+    }
+</script>
+</body>
+
+</html>

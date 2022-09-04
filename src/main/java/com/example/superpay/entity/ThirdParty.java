@@ -28,6 +28,7 @@ public class ThirdParty {
     private String secretKey=null;
     private String publicKey=null;
     private String appid=null;
+    private boolean qrcode = false;
     private String typeId=null;
     private int third = 0;
     private int state=0;

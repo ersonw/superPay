@@ -4,20 +4,47 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayTradePrecreateRequest;
 import com.alipay.api.request.AlipayTradeRefundRequest;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
 
+import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.example.superpay.config.AlipayConfig;
 import com.example.superpay.entity.Order;
 import com.example.superpay.entity.ThirdParty;
 import org.apache.commons.lang3.StringUtils;
 
 public class AlipayUtil {
-
+    public static String alipayNative(ThirdParty thirdParty, Order order){
+        AlipayClient alipayClient = new DefaultAlipayClient("https://openapi.alipay.com/gateway.do",thirdParty.getMchId(),thirdParty.getSecretKey(),"json",AlipayConfig.charset,thirdParty.getPublicKey(),AlipayConfig.sign_type);
+        AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
+        request.setNotifyUrl(thirdParty.getNotifyUrl());
+        JSONObject bizContent = new JSONObject();
+        bizContent.put("out_trade_no", order.getOutTradeNo());
+        bizContent.put("total_amount", order.getMoney());
+        bizContent.put("subject", order.getOutTradeNo());
+        bizContent.put("timeout_express","5m");
+//        bizContent.put("time_expire","15m");
+        request.setBizContent(bizContent.toString());
+        try{
+            AlipayTradePrecreateResponse response = alipayClient.execute(request);
+            if(response.isSuccess()){
+//                System.out.println("调用成功");
+                return response.getQrCode();
+            } else {
+                System.out.println("调用失败");
+            }
+//            System.out.println(response.getQrCode());
+        } catch (AlipayApiException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     public static String alipay(ThirdParty thirdParty, Order order){
         AlipayConfig.alipay_public_key = thirdParty.getPublicKey();
         AlipayConfig.merchant_private_key = thirdParty.getSecretKey();
@@ -27,7 +54,7 @@ public class AlipayUtil {
         }
         AlipayConfig.return_url = thirdParty.getCallbackUrl();
         AlipayConfig.notify_url = thirdParty.getNotifyUrl();
-        return alipay(order.getOutTradeNo(),order.getMoney().toString(),order.getOutTradeNo(),"生活服务");
+        return alipay(order.getOutTradeNo(),order.getMoney().toString(),order.getOutTradeNo(),order.getOutTradeNo());
     }
     /**
      * @Title: alipay
@@ -49,7 +76,7 @@ public class AlipayUtil {
 
 
         //该笔订单允许的最晚付款时间
-        String timeout="30m";
+        String timeout="5m";
         //设置请求参数
         String content = "{\"out_trade_no\":\""+ outTradeNo +"\","
                 + "\"total_amount\":\""+ totalAmount +"\","
@@ -139,7 +166,9 @@ public class AlipayUtil {
                     strs.append(value);
                 }
 //                System.out.println(("key:"+key+" value为："+strs));
-                paramsMap.put(key, strs.toString());
+                if (StringUtils.isNotEmpty(strs.toString())){
+                    paramsMap.put(key, strs.toString());
+                }
             }
         });
 

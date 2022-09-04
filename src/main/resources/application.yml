@@ -1,0 +1,31 @@
+server:
+  port: 8000
+  servlet:
+    encoding:
+      charset: utf-8
+spring:
+  redis:
+    host: super-os
+    password: 2pmnpw47
+  web:
+    resources:
+      static-locations: /static/
+  thymeleaf:
+#    prefix: /static/
+    prefix: classpath:/
+    cache: false
+  data:
+    mongodb:
+#      uri: mongodb://mongo-admin:6d2880f9f562108b@super-os:27017/?authSource=admin
+      username: mongo-admin
+      password: 6d2880f9f562108b
+      port: 27017
+      host: super-os
+      database: super_pay
+      authentication-database: admin
+logging:
+  level:
+    com:
+      github:
+        binarywang:
+          wxpay: OFF

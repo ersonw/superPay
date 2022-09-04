@@ -3,44 +3,56 @@ package com.example.superpay.util;
 import com.example.superpay.entity.Order;
 import com.example.superpay.entity.ThirdParty;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
+import com.github.binarywang.wxpay.bean.result.WxPayUnifiedOrderResult;
 import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import com.github.wxpay.sdk.WXPay;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 public class WxPayUtil {
-
-    public static String wxPayH5s(ThirdParty thirdParty, Order order,String ip) {
-//        WxPayConfig payConfig = new WxPayConfig();
-//        payConfig.setAppId(thirdParty.getAppid());
-//        payConfig.setMchId(thirdParty.getMchId());
-//        payConfig.setMchKey(thirdParty.getSecretKey());
-//        // 可以指定是否使用沙箱环境
-//        payConfig.setUseSandboxEnv(false);
-////        payConfig.setSubAppId(StringUtils.trimToNull(this.properties.getSubAppId()));
-////        payConfig.setSubMchId(StringUtils.trimToNull(this.properties.getSubMchId()));
+    public static String wxNative(ThirdParty thirdParty, Order order,String ip){
+        WxPayConfig payConfig = new WxPayConfig();
+        payConfig.setAppId(thirdParty.getAppid());
+        payConfig.setMchId(thirdParty.getMchId());
+        payConfig.setMchKey(thirdParty.getSecretKey());
+        // 可以指定是否使用沙箱环境
+        payConfig.setUseSandboxEnv(false);
+//        payConfig.setSubAppId(StringUtils.trimToNull(this.properties.getSubAppId()));
+//        payConfig.setSubMchId(StringUtils.trimToNull(this.properties.getSubMchId()));
 //        payConfig.setKeyPath("classpath://apiclient_cert.p12");
-//        WxPayService wxPayService = new WxPayServiceImpl();
-//        wxPayService.setConfig(payConfig);
-//        WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
-//        wxPayUnifiedOrderRequest.setBody(order.getOutTradeNo());
-//        wxPayUnifiedOrderRequest.setOutTradeNo(order.getOutTradeNo());
-//        wxPayUnifiedOrderRequest.setTotalFee(new Double(order.getMoney() * 100).intValue());
-//        wxPayUnifiedOrderRequest.setSpbillCreateIp(ip);
-//        wxPayUnifiedOrderRequest.setNotifyUrl(thirdParty.getNotifyUrl());
-//        wxPayUnifiedOrderRequest.setTradeType("JSAPI");
+        payConfig.setKeyContent(Base64.getDecoder().decode(thirdParty.getPublicKey()));
+        WxPayService wxPayService = new WxPayServiceImpl();
+        wxPayService.setConfig(payConfig);
+        WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
+        wxPayUnifiedOrderRequest.setBody(order.getOutTradeNo());
+        wxPayUnifiedOrderRequest.setProductId(order.getOutTradeNo());
+        wxPayUnifiedOrderRequest.setOutTradeNo(order.getOutTradeNo());
+        wxPayUnifiedOrderRequest.setTotalFee(new Double(order.getMoney() * 100).intValue());
+        wxPayUnifiedOrderRequest.setSpbillCreateIp(ip);
+        wxPayUnifiedOrderRequest.setNotifyUrl(thirdParty.getNotifyUrl());
+        wxPayUnifiedOrderRequest.setTradeType("NATIVE");
+        wxPayUnifiedOrderRequest.setTimeExpire(TimeUtil.getWxTimeExpire(System.currentTimeMillis() + 1000 * 60 * 5));
 //        wxPayUnifiedOrderRequest.setOpenid("oU5Ta5f9Vx6f-***********");
-//        try{
+        try{
 //            System.out.println(wxPayService.unifiedOrder(wxPayUnifiedOrderRequest));
-//        } catch (WxPayException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println(ip);
+            WxPayUnifiedOrderResult result = wxPayService.unifiedOrder(wxPayUnifiedOrderRequest);
+            if(StringUtils.isNotEmpty(result.getCodeURL())){
+                return result.getCodeURL();
+            }
+        } catch (WxPayException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static String wxPayH5s(ThirdParty thirdParty, Order order,String ip) {
+        if (true) return wxNative(thirdParty,order,ip);
         try {
             Map< String, String > maps = new HashMap<>( );
             maps.put("out_trade_no", order.getOutTradeNo());
@@ -49,6 +61,7 @@ public class WxPayUtil {
             maps.put("trade_type", "MWEB");
             maps.put("notify_url", thirdParty.getNotifyUrl());
             maps.put("body", order.getOutTradeNo());
+            maps.put("time_expire",TimeUtil.getWxTimeExpire(System.currentTimeMillis() + 1000 * 60 * 5));
             WXPay wxPay = new WXPay( new WXConfigUtil(thirdParty.getAppid(),thirdParty.getMchId(),thirdParty.getSecretKey(),thirdParty.getPublicKey()));
             Map< String, String > reqData = wxPay.fillRequestData(maps);
 
