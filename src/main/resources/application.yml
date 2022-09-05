@@ -26,6 +26,8 @@ spring:
 logging:
   level:
     com:
+      alipay:
+        api: OFF
       github:
         binarywang:
           wxpay: OFF

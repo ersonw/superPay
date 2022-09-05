@@ -193,7 +193,7 @@ public class AdapterService {
         return parties.getContent().get(0);
     }
 
-    public EPayData test() {
+    public EPayData test(String type) {
         ThirdParty thirdParty = new ThirdParty();
         thirdParty.setThird(1);
         thirdParty.setAddTime(System.currentTimeMillis());
@@ -231,7 +231,7 @@ public class AdapterService {
 //        payTypeRepository.save(type);
         EPayData data = new EPayData();
         data.setPid(202206252104000L);
-        data.setType("alipay");
+        data.setType(type);
         data.setOut_trade_no(TimeUtil._getOrderNo());
         data.setNotify_url("https://pay.telebott.com/v3api/testNotify");
         data.setReturn_url("https://pay.telebott.com/v3api/testReturn");
@@ -436,7 +436,7 @@ public class AdapterService {
     }
 
     public String ePayNotify(EPayNotify ePayNotify) {
-        System.out.printf("%s\n", ePayNotify);
+//        System.out.printf("%s\n", ePayNotify);
         if (ePayNotify.getPid() == 0) return "error";
         List<ThirdParty> partys = thirdPartyRepository.findAllByMchId(ePayNotify.getPid().toString());
         if (partys.isEmpty()) {
@@ -752,8 +752,13 @@ public class AdapterService {
             ThirdParty party = thirdPartyList.get(0);
             if (!WxPayUtil.notifyUrl(party,notifyMap)) return "error";
             Order order = orderRepository.findAllByOutTradeNo(out_trade_no);
+            if (order == null){
+                return "error";
+            }
             User user = userRepository.findAllById(order.getUid());
-            if (order == null || user == null) return "error";
+            if(user == null){
+                return "error";
+            }
             if (order.getState() == 1) {
                 return "success";
             }

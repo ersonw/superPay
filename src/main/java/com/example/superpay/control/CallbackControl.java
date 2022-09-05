@@ -24,8 +24,8 @@ public class CallbackControl {
     }
 
     @GetMapping("/v3api/test")
-    public ModelAndView test(){
-        return service.ePayOrder(service.test());
+    public ModelAndView test(@RequestParam(value = "type",defaultValue = "alipay") String type){
+        return service.ePayOrder(service.test(type));
     }
     @ApiIgnore
     @GetMapping("/v3api/alipay")
