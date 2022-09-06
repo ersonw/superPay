@@ -46,6 +46,8 @@ public class EPayData {
 
     @ApiModelProperty(hidden = true)
     private String ip;
+    @ApiModelProperty(hidden = true)
+    private String referer;
 
     @Override
     public String toString() {

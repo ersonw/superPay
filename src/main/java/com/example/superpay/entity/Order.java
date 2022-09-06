@@ -25,6 +25,7 @@ public class Order {
     private String notifyUrl=null;
     private String qrcode=null;
     private String name=null;
+    private String referer=null;
     private Double money=0D;
     private Double totalFee=0D;
     private Double fee=0D;

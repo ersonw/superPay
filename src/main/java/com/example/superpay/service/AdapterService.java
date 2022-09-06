@@ -65,6 +65,9 @@ public class AdapterService {
         if (user.getState() != 0) {
             return ToolsUtil.errorHtml("商户存在异常，请联系管理员!");
         }
+        if(!isDomian(user, ePay.getReferer())){
+            return ToolsUtil.errorHtml("非法提交!");
+        }
         if (isLimit(user)) {
             return ToolsUtil.errorHtml("商户已达到未结算最大限额，请联系管理员!");
         }
@@ -83,24 +86,12 @@ public class AdapterService {
         if (type == null) {
             return ToolsUtil.errorHtml("支付方式已被禁用!");
         }
-        ThirdParty party = null;
-        if (type.getName().equals("alipay")){
-            if (StringUtils.isNotEmpty(user.getAlipay())){
-                party = thirdPartyRepository.findAllById(user.getAlipay());
-            }else {
-                party = getThird(type.getId());
-            }
-        }else if (type.getName().equals("wxpay")){
-            if (StringUtils.isNotEmpty(user.getWxpay())){
-                party = thirdPartyRepository.findAllById(user.getWxpay());
-            }else{
-                party = getThird(type.getId());
-            }
-        }
+        ThirdParty party = getThird(user,type);
         if (party == null) {
             return ToolsUtil.errorHtml("通道已关闭！");
         }
         order = new Order();
+        order.setReferer(ePay.getReferer());
         order.setUid(user.getId());
         order.setOutTradeNo(ePay.getOut_trade_no());
         order.setThirdPartyId(party.getId());
@@ -129,6 +120,17 @@ public class AdapterService {
 
         return handlerThirdParty(party, order, ePay.getType(),ePay.getIp());
     }
+
+    private boolean isDomian(User user, String ref) {
+        if (StringUtils.isEmpty(user.getDomain())) return true;
+        if (StringUtils.isEmpty(ref)) return false;
+        String[] referers = user.getDomain().split(",");
+        for (String referer : referers) {
+            if (ref.contains(referer)) return true;
+        }
+        return false;
+    }
+
     private boolean isLimit(User user){
         if (user.getLimit() == 0) return false;
         Double money = orderDao.getOrderSum(user.getId(),TimeUtil.getTodayZero(),System.currentTimeMillis());
@@ -209,6 +211,26 @@ public class AdapterService {
         return ToolsUtil.errorHtml("未获取到第三方资源！");
     }
 
+    private ThirdParty getThird(User user,PayType type) {
+//        ThirdParty party = getThird(type.getId());
+        ThirdParty party;
+        if (type.getName().equals("alipay")){
+            if (StringUtils.isNotEmpty(user.getAlipay())){
+                party = thirdPartyRepository.findAllById(user.getAlipay());
+            }else{
+                party = getThird(type.getId());
+            }
+        }else if (type.getName().equals("wxpay")){
+            if (StringUtils.isNotEmpty(user.getWxpay())){
+                party = thirdPartyRepository.findAllById(user.getWxpay());
+            }else{
+                party = getThird(type.getId());
+            }
+        }else{
+            party = getThird(type.getId());
+        }
+        return party;
+    }
     private ThirdParty getThird(String type) {
         Pageable pageable = PageRequest.of(PAY_TYPE_INDEX, 1);
         Page<ThirdParty> parties = thirdPartyRepository.findAllByTypeIdAndState(type, 1, pageable);

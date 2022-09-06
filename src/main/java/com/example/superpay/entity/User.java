@@ -21,6 +21,7 @@ public class User {
     private long pid=0;
     @Field("username")
     private String username=null;
+    private String domain=null;
     private String alipay=null;
     private String wxpay=null;
     @Field("avatar")
