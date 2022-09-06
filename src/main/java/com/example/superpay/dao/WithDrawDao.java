@@ -20,6 +20,14 @@ public class WithDrawDao {
         if(results.getMappedResults().isEmpty()) return 0D;
         return results.getMappedResults().get(0).getDouble("sum");
     }
+    public Double getWithDrawSum(String uid, long start, long end){
+        AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
+                match(Criteria.where("uid").is(uid))
+                ,match(Criteria.where("addTime").gte(start).lte(end))
+                ,group().sum("money").as("sum")), "withdraw", JSONObject.class);
+        if(results.getMappedResults().isEmpty()) return 0D;
+        return results.getMappedResults().get(0).getDouble("sum");
+    }
     public Double getWithDrawSum(String uid, int state){
         AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
                 match(Criteria.where("uid").is(uid))

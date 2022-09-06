@@ -27,6 +27,8 @@ public class ThirdParty {
     private String errorUrl=null;
     private String secretKey=null;
     private String publicKey=null;
+    private String rootKey=null;
+    private String appPublicKey=null;
     private String appid=null;
     private boolean qrcode = false;
     private String typeId=null;

@@ -1,6 +1,8 @@
 package com.example.superpay.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.superpay.dao.OrderDao;
+import com.example.superpay.dao.WithDrawDao;
 import com.example.superpay.data.*;
 import com.example.superpay.entity.*;
 import com.example.superpay.repository.*;
@@ -46,6 +48,10 @@ public class AdapterService {
     private ThirdPartyRepository thirdPartyRepository;
     @Autowired
     private ShortLinkRepository shortLinkRepository;
+    @Autowired
+    private OrderDao orderDao;
+    @Autowired
+    private WithDrawDao withDrawDao;
 
     public ModelAndView ePayOrder(EPayData ePay) {
 //        System.out.printf(JSONObject.toJSONString(ePay));
@@ -58,6 +64,9 @@ public class AdapterService {
         }
         if (user.getState() != 0) {
             return ToolsUtil.errorHtml("商户存在异常，请联系管理员!");
+        }
+        if (isLimit(user)) {
+            return ToolsUtil.errorHtml("商户已达到未结算最大限额，请联系管理员!");
         }
         if (!ePay.isSign(user.getSecretKey())) {
             return ToolsUtil.errorHtml("数据效验失败!");
@@ -74,11 +83,23 @@ public class AdapterService {
         if (type == null) {
             return ToolsUtil.errorHtml("支付方式已被禁用!");
         }
-        ThirdParty party = getThird(type.getId());
+        ThirdParty party = null;
+        if (type.getName().equals("alipay")){
+            if (StringUtils.isNotEmpty(user.getAlipay())){
+                party = thirdPartyRepository.findAllById(user.getAlipay());
+            }else {
+                party = getThird(type.getId());
+            }
+        }else if (type.getName().equals("wxpay")){
+            if (StringUtils.isNotEmpty(user.getWxpay())){
+                party = thirdPartyRepository.findAllById(user.getWxpay());
+            }else{
+                party = getThird(type.getId());
+            }
+        }
         if (party == null) {
             return ToolsUtil.errorHtml("通道已关闭！");
         }
-//        Order order = new Order();
         order = new Order();
         order.setUid(user.getId());
         order.setOutTradeNo(ePay.getOut_trade_no());
@@ -108,7 +129,13 @@ public class AdapterService {
 
         return handlerThirdParty(party, order, ePay.getType(),ePay.getIp());
     }
-
+    private boolean isLimit(User user){
+        if (user.getLimit() == 0) return false;
+        Double money = orderDao.getOrderSum(user.getId(),TimeUtil.getTodayZero(),System.currentTimeMillis());
+        Double withDraw = withDrawDao.getWithDrawSum(user.getId(),TimeUtil.getTodayZero(),System.currentTimeMillis());
+        money = money - withDraw;
+        return money > user.getLimit();
+    }
     private ModelAndView handlerThirdParty(ThirdParty thirdParty, Order order, String type,String ip) {
         String domain = thirdParty.getDomain();
         if (StringUtils.isEmpty(domain)) {
@@ -170,7 +197,7 @@ public class AdapterService {
             case PAY_TYPE_EPAY:
                 String ePayData = EPayUtil.submit(thirdParty,order,type);
                 if (ePayData != null) {
-                    order.setQrcode(ePayData);
+//                    order.setQrcode(ePayData);
                     orderRepository.save(order);
 //                    System.out.println(ePayData);
                     return ToolsUtil.emptyHtml(ePayData);
@@ -236,6 +263,12 @@ public class AdapterService {
 //        type.setUpdateTime(System.currentTimeMillis());
 //        type.setName("支付宝");
 //        payTypeRepository.save(type);
+//        List<ThirdParty> partys = thirdPartyRepository.findAllByTypeIdAndStateAndThird("de12ad07CsHdf1ekeu4965KrRb08ec9F89088fa05746ciI",1,1);
+//        for (ThirdParty party: partys) {
+//            boolean isSuccess = AlipayUtil.userTransfer(party);
+////            String amount = AlipayUtil.aliBalance(party);
+//            System.out.println(isSuccess);
+//        }
         EPayData data = new EPayData();
         data.setPid(202206252104000L);
         data.setType(type);

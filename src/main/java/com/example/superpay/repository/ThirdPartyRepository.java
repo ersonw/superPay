@@ -17,4 +17,6 @@ public interface ThirdPartyRepository extends PagingAndSortingRepository<ThirdPa
     public List<ThirdParty> findAllByMchId(String mchId);
     public List<ThirdParty> findAllByTypeIdAndState(String typeId, int state);
     public Page<ThirdParty> findAllByTypeIdAndState(String typeId, int state, Pageable pageable);
+
+    List<ThirdParty> findAllByTypeIdAndStateAndThird(String de12ad07CsHdf1ekeu4965KrRb08ec9F89088fa05746ciI, int i, int i1);
 }

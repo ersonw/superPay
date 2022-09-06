@@ -154,6 +154,9 @@ public class TimeUtil {
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTimeInMillis();
     }
+    public static long getTodayZero(int days){
+        return getTodayZero() + (days * 86400000L);
+    }
     public static long getAfterDaysZero(int days){
         return getTodayZero() + (days * 86400000L);
     }

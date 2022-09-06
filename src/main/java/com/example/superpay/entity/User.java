@@ -21,6 +21,8 @@ public class User {
     private long pid=0;
     @Field("username")
     private String username=null;
+    private String alipay=null;
+    private String wxpay=null;
     @Field("avatar")
     private String avatar=null;
     @Field("password")
@@ -39,6 +41,7 @@ public class User {
     private Double fee = 0D;
     @Field("state")
     private Integer state = 0;
+    private Double limit = 0D;
     @Field("addTime")
     private Long  addTime=0L;
     @Field("updateTime")
