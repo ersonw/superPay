@@ -18,7 +18,7 @@ public class ShortLinkControl {
     private ShortLinkService service;
     @GetMapping("/s/{id}")
     public ModelAndView search(@PathVariable String id,
-                               @RequestParam(value = "url",required = false) @ApiParam(hidden = true) String url ,
+                               @RequestParam(value = "uri",required = false) @ApiParam(hidden = true) String url ,
                                @RequestParam(value = "ip") @ApiParam(hidden = true) String ip){
         return service.search(id, url,ip);
     }

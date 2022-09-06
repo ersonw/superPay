@@ -111,13 +111,16 @@ public class AdapterService {
 
     private ModelAndView handlerThirdParty(ThirdParty thirdParty, Order order, String type,String ip) {
         String domain = thirdParty.getDomain();
-        if (StringUtils.isNotEmpty(domain) && !domain.startsWith("http")){
-            domain = "http://" + domain;
+        if (StringUtils.isEmpty(domain)) {
+            domain = "";
+        }else if (!domain.startsWith("http")){
+            domain = "://" + domain;
         }
         switch (thirdParty.getThird()) {
             case PAY_TYPE_DEFAULT:
                 String url = ThirdPartyUtil.toPay(order, thirdParty);
                 if (url != null) {
+                    order.setQrcode(url);
                     orderRepository.save(order);
                     return ToolsUtil.getHtml(url);
                 }
@@ -143,15 +146,17 @@ public class AdapterService {
                     if (type.equals("wxpay")){
                         String wxUrl = WxPayUtil.wxPayH5s(thirdParty,order,ip);
                         if (wxUrl != null) {
-                            System.out.println(wxUrl);
-                            orderRepository.save(order);
                             ShortLink wxLink = new ShortLink(wxUrl);
                             shortLinkRepository.save(wxLink);
+                            order.setQrcode(domain+"/s/"+wxLink.getId());
+//                            System.out.println(wxUrl);
+                            orderRepository.save(order);
                             return ToolsUtil.getHtml(domain+"/s/"+wxLink.getId());
                         }
                     }else if (type.equals("alipay")){
                         String data = AlipayUtil.alipay(thirdParty,order);
                         if (data != null) {
+                            order.setQrcode(data);
                             orderRepository.save(order);
 //                        ShortLink aliLink = new ShortLink(data);
 //                        shortLinkRepository.save(aliLink);
@@ -165,6 +170,7 @@ public class AdapterService {
             case PAY_TYPE_EPAY:
                 String ePayData = EPayUtil.submit(thirdParty,order,type);
                 if (ePayData != null) {
+                    order.setQrcode(ePayData);
                     orderRepository.save(order);
 //                    System.out.println(ePayData);
                     return ToolsUtil.emptyHtml(ePayData);
@@ -268,7 +274,7 @@ public class AdapterService {
 //                PayType type = payTypeRepository.findAllByType(party.getTypeId());
                 if (type!= null) {
                     object.put("name", type.getName());
-                    if(StringUtils.isNotEmpty(order.getQrcode())){
+                    if(party.isQrcode()){
                         if (type.getType().equals("alipay")){
                             return ToolsUtil.alipayHtml(object);
                         }else if (type.getType().equals("wxpay")){

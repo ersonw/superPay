@@ -19,7 +19,7 @@ public class ShortLinkService {
     @Autowired
     private ShortLinkRepository shortLinkRepository;
     public void search(String id, String url, String ip, HttpServletResponse response) {
-        System.out.printf("id:%s url:%s ip:%s\n",id,url,ip);
+//        System.out.printf("id:%s url:%s ip:%s\n",id,url,ip);
         try {
             if(StringUtils.isEmpty(id)) {
                 response.sendError(404);
@@ -46,6 +46,7 @@ public class ShortLinkService {
         }
     }
     public ModelAndView search(String id, String url, String ip) {
+//        url = url.replaceAll("https", "").replaceAll("http","");
 //        System.out.printf("id:%s url:%s ip:%s\n",id,url,ip);
         try {
             if(StringUtils.isEmpty(id)) {
@@ -62,7 +63,8 @@ public class ShortLinkService {
             if(link == null) {
                 throw new RuntimeException("link不存在");
             }
-            return ToolsUtil.postHtml(link.getLink(), new JSONObject());
+            return ToolsUtil.postHtml(url, new JSONObject());
+//            return ToolsUtil.getHtml(link.getLink());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return ToolsUtil.errorHtml(e.getMessage());

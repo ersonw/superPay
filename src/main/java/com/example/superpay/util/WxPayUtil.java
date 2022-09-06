@@ -52,7 +52,6 @@ public class WxPayUtil {
         return null;
     }
     public static String wxPayH5s(ThirdParty thirdParty, Order order,String ip) {
-        if (true) return wxNative(thirdParty,order,ip);
         try {
             Map< String, String > maps = new HashMap<>( );
             maps.put("out_trade_no", order.getOutTradeNo());
