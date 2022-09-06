@@ -1,5 +1,6 @@
 package com.example.superpay.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.superpay.entity.ShortLink;
 import com.example.superpay.repository.ShortLinkRepository;
 import com.example.superpay.util.ToolsUtil;
@@ -17,33 +18,33 @@ import javax.servlet.http.HttpServletResponse;
 public class ShortLinkService {
     @Autowired
     private ShortLinkRepository shortLinkRepository;
-//    public void search(String id, String url, String ip, HttpServletResponse response) {
-//        System.out.printf("id:%s url:%s ip:%s\n",id,url,ip);
-//        try {
-//            if(StringUtils.isEmpty(id)) {
-//                response.sendError(404);
-//                return;
-//            }
-//            if(StringUtils.isEmpty(url)) {
-//                response.sendError(404);
-//                return;
-//            }
-//            if(StringUtils.isEmpty(ip)) {
-//                response.sendError(404);
-//                return;
-//            }
-//            ShortLink link = shortLinkRepository.findAllById(id);
-////            System.out.println(link);
-//            if(link == null) {
-//                response.sendError(404);
-//                return;
-//            }
+    public void search(String id, String url, String ip, HttpServletResponse response) {
+        System.out.printf("id:%s url:%s ip:%s\n",id,url,ip);
+        try {
+            if(StringUtils.isEmpty(id)) {
+                response.sendError(404);
+                return;
+            }
+            if(StringUtils.isEmpty(url)) {
+                response.sendError(404);
+                return;
+            }
+            if(StringUtils.isEmpty(ip)) {
+                response.sendError(404);
+                return;
+            }
+            ShortLink link = shortLinkRepository.findAllById(id);
+//            System.out.println(link);
+            if(link == null) {
+                response.sendError(404);
+                return;
+            }
 //            response.setHeader("referer",url);
-//            response.sendRedirect(link.getLink());
-//        } catch (Exception e) {
-//            log.error(e.getMessage(), e);
-//        }
-//    }
+            response.sendRedirect(link.getLink());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
     public ModelAndView search(String id, String url, String ip) {
 //        System.out.printf("id:%s url:%s ip:%s\n",id,url,ip);
         try {
@@ -61,7 +62,7 @@ public class ShortLinkService {
             if(link == null) {
                 throw new RuntimeException("link不存在");
             }
-            return ToolsUtil.getHtml(link.getLink());
+            return ToolsUtil.postHtml(link.getLink(), new JSONObject());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return ToolsUtil.errorHtml(e.getMessage());

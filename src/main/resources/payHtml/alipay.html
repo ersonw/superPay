@@ -8,7 +8,7 @@
     <title>支付宝扫码支付</title>
     <link href="/static/css/alipay_pay.css" rel="stylesheet" media="screen">
 </head>
-<body>
+<body onload="_get()">
 <div class="body">
     <h1 class="mod-title">
         <span class="ico-wechat"></span><span class="text">支付宝扫码支付</span>
@@ -43,6 +43,7 @@
         </div>
     </div>
 </div>
+<a th:href="${url}" id="a0001"></a>
 <meta http-equiv="refresh" content="6;url=">
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/layer.min.js"></script>
@@ -68,6 +69,17 @@
             });
         }
     });
+    function _get(){
+        // window.document.getElementById("a0001").click();
+        if (isAlipay()){
+            // window.location.href = window.document.getElementById('qrcode').getAttribute("data");
+            window.document.getElementById("a0001").click();
+        }
+    }
+    function isAlipay() {
+        let ua = window.navigator.userAgent.toLowerCase();
+        return ua.match(/Alipay/i) == "alipay"; // 判定为true则是微信浏览器，false则不是
+    }
 </script>
 </body>
 </html>

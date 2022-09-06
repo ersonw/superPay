@@ -8,7 +8,7 @@
     <title>微信安全支付</title>
     <link href="/static/css/wechat_pay.css" rel="stylesheet" media="screen">
 </head>
-<body>
+<body onload="_get()">
 <div class="body">
     <h1 class="mod-title">
         <span class="ico-wechat"></span><span class="text">微信支付</span>
@@ -49,11 +49,13 @@
         </div>
     </div>
 </div>
+<a th:href="${url}" id="a0001"></a>
 <meta http-equiv="refresh" content="15;url=">
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/layer.min.js"></script>
 <script src="/static/js/jquery.qrcode.min.js"></script>
 <script>
+
     $('#qrcode').qrcode({
         text: window.document.getElementById('qrcode').getAttribute("data"),
         width: 230,
@@ -73,6 +75,18 @@
             });
         }
     });
+    function _get(){
+        // window.document.getElementById("a0001").click();
+        // alert(isWeChat());
+        if (isWeChat() == true){
+            // window.location.href = window.document.getElementById('qrcode').getAttribute("data");
+            window.document.getElementById("a0001").click();
+        }
+    }
+    function isWeChat() {
+        let ua = window.navigator.userAgent.toLowerCase();
+        return ua.match(/MicroMessenger/i) == "micromessenger"; // 判定为true则是微信浏览器，false则不是
+    }
 </script>
 </body>
 </html>

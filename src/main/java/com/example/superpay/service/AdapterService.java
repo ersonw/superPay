@@ -143,6 +143,7 @@ public class AdapterService {
                     if (type.equals("wxpay")){
                         String wxUrl = WxPayUtil.wxPayH5s(thirdParty,order,ip);
                         if (wxUrl != null) {
+                            System.out.println(wxUrl);
                             orderRepository.save(order);
                             ShortLink wxLink = new ShortLink(wxUrl);
                             shortLinkRepository.save(wxLink);
