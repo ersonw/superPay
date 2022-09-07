@@ -323,6 +323,7 @@ public class AdapterService {
             object.put("out_trade_no", out_trade_no);
             object.put("money", "￥"+order.getMoney());
             object.put("time", TimeUtil.getDateTime(order.getAddTime()));
+            object.put("expired", order.getAddTime()+ 1000 * 60 * 5);
             ThirdParty party = thirdPartyRepository.findAllById(order.getThirdPartyId());
             if (party != null){
                     PayType type = payTypeRepository.findAllById(party.getTypeId());

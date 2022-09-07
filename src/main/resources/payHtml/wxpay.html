@@ -7,6 +7,18 @@
     <meta name="renderer" content="webkit">
     <title>微信安全支付</title>
     <link href="/static/css/wechat_pay.css" rel="stylesheet" media="screen">
+    <style type="text/css">
+        .qrcode {
+            width: 80%;
+            height: 100%;
+            background: #efefef;
+            -moz-opacity: 0.8;
+            opacity: 0.8;
+            -webkit-filter: blur(10px); /* Chrome, Opera */
+            -ms-filter: blur(10px);
+            filter: blur(10px);
+        }
+    </style>
 </head>
 <body onload="_get()">
 <div class="body">
@@ -16,6 +28,7 @@
     <div class="mod-ct">
         <div class="order">
         </div>
+        <h2 id="showtime"></h2>
         <div class="amount" th:text="${ money }">￥</div>
         <div class="qr-image" id="qrcode" th:data="${url}">
         </div>
@@ -26,7 +39,7 @@
                 <dt>商户订单号</dt>
                 <dd id="billId" th:text="${ out_trade_no }"></dd>
                 <dt>创建时间</dt>
-                <dd id="createTime" th:text="${ time }"></dd>
+                <dd id="createTime" th:text="${ time }" th:data="${ expired }"></dd>
             </dl>
             <a href="javascript:void(0)" class="arrow"><i class="ico-arrow"></i></a>
         </div>
@@ -55,7 +68,23 @@
 <script src="/static/js/layer.min.js"></script>
 <script src="/static/js/jquery.qrcode.min.js"></script>
 <script>
-
+    var showtime = function () {
+        var nowtime = new Date(),  //获取当前时间
+            endtime = new Date();  //定义结束时间
+        endtime.setTime(parseInt(window.document.getElementById('createTime').getAttribute("data")));
+        //console.log(endtime.getTime());
+        //console.log(nowtime.getTime());
+        var lefttime = endtime.getTime() - nowtime.getTime(),  //距离结束时间的毫秒数
+            leftd = Math.floor(lefttime / (1000 * 60 * 60 * 24)),  //计算天数
+            lefth = Math.floor(lefttime / (1000 * 60 * 60) % 24),  //计算小时数
+            leftm = Math.floor(lefttime / (1000 * 60) % 60),  //计算分钟数
+            lefts = Math.floor(lefttime / 1000 % 60);  //计算秒数
+        if (lefttime < 0) {
+            document.getElementById("qrcode").classList.add("qrcode");
+            return "二维码已过期";
+        }
+        return "距离二维码过期还剩余 " + lefth + ":" + leftm + ":" + lefts;  //返回倒计时的字符串
+    }
     $('#qrcode').qrcode({
         text: window.document.getElementById('qrcode').getAttribute("data"),
         width: 230,
@@ -75,14 +104,20 @@
             });
         }
     });
-    function _get(){
+
+    function _get() {
+        var div = document.getElementById("showtime");
+        setInterval(function () {
+            div.innerHTML = showtime();
+        }, 1000);
         // window.document.getElementById("a0001").click();
         // alert(isWeChat());
-        if (isWeChat() == true){
+        if (isWeChat() == true) {
             // window.location.href = window.document.getElementById('qrcode').getAttribute("data");
             window.document.getElementById("a0001").click();
         }
     }
+
     function isWeChat() {
         let ua = window.navigator.userAgent.toLowerCase();
         return ua.match(/MicroMessenger/i) == "micromessenger"; // 判定为true则是微信浏览器，false则不是
