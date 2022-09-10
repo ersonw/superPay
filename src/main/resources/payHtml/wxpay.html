@@ -62,7 +62,7 @@
         </div>
     </div>
 </div>
-<a th:href="${url}" id="a0001"></a>
+<a th:href="${url}" id="a0001" target="_blank"></a>
 <meta http-equiv="refresh" content="15;url=">
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/layer.min.js"></script>
@@ -111,6 +111,7 @@
             div.innerHTML = showtime();
         }, 1000);
         // window.document.getElementById("a0001").click();
+        // alert(isWeChat());
         // alert(isWeChat());
         if (isWeChat() == true) {
             // window.location.href = window.document.getElementById('qrcode').getAttribute("data");

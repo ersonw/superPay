@@ -56,12 +56,13 @@
         </div>
     </div>
 </div>
-<a th:href="${url}" id="a0001"></a>
+<a th:href="${url}" id="a0001" target="_blank"></a>
 <meta http-equiv="refresh" content="15;url=">
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/layer.min.js"></script>
 <script src="/static/js/jquery.qrcode.min.js"></script>
 <script>
+
     var showtime = function () {
         var nowtime = new Date(),  //获取当前时间
             endtime = new Date();  //定义结束时间
@@ -105,14 +106,20 @@
             div.innerHTML = showtime();
         }, 1000);
         // window.document.getElementById("a0001").click();
+        // alert(isAlipay());
         if (isAlipay()){
             // window.location.href = window.document.getElementById('qrcode').getAttribute("data");
             window.document.getElementById("a0001").click();
+            // window.open(window.document.getElementById('qrcode').getAttribute("data"), '_blank')
         }
     }
     function isAlipay() {
-        let ua = window.navigator.userAgent.toLowerCase();
-        return ua.match(/Alipay/i) == "alipay"; // 判定为true则是微信浏览器，false则不是
+        // let ua = window.navigator.userAgent.toLowerCase();
+        let ua = window.navigator.userAgent;
+        return ua.indexOf('Android') > -1 ||
+            ua.indexOf('iPhone') > -1 || ua.indexOf('iPad') > -1 || ua.indexOf('iPod') > -1 ||
+            ua.indexOf('Symbian') > -1; // 判定为true则是微信浏览器，false则不是
+        // return ua.match(/Alipay/i) === "alipay" ; // 判定为true则是微信浏览器，false则不是
     }
 </script>
 </body>
