@@ -40,7 +40,9 @@ public class ShortLinkService {
                 return;
             }
 //            response.setHeader("referer",url);
-            response.sendRedirect(link.getLink());
+            String l = link.getLink();
+            shortLinkRepository.delete(link);
+            response.sendRedirect(l);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

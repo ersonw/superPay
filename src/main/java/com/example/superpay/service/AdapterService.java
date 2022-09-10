@@ -266,14 +266,14 @@ public class AdapterService {
         thirdParty.setThird(PAY_TYPE_NATIVE);
         thirdParty.setAddTime(System.currentTimeMillis());
         thirdParty.setState(1);
-        thirdParty.setTitle("典酱续支付宝");
-        thirdParty.setMchId("2021003147669218");
-        thirdParty.setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoUL2dqWWaSNIU4XsGdOlzqXa1BiieE/q20CfcGAXwmNrfMXcE7odRWHBSpfyt2EkIl1iHBgvWuZL8t5+X7snvvTg7VL9il0iiYc6dJ7W1pbzfZzRraqVpAksIGHUjJgGMqmbOebUHuojDPqvyBtrflJhd7OHqQD/eNNA6HZgVj3j+3QaAcLJH/nPN7h5gANRyQH5+YERGnqqmW8k8azm6stJkSbXdeZKG9vRqKf6wb7DE1ZArqT0acHoXv8RB8egBtlmYzc9RxBNKC9hdtXZzc1ca8j82m4l69qfL9ykriAd8DwRNhUEk506GkhW2A1C/iYZo176Y32LcpmIi/6CRQIDAQAB");
-//        thirdParty.setAppid("wx4fcd04bc73de65e1");
-        thirdParty.setSecretKey("MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDJnZ40HVWt6r7xIL+TxoGLZrJsngUUagmm7iLiJ3zkK1YFHpOFXrwzp1IyFuMTwl8mTzol6uajrVpAy3af+cfbFtzYrbuG+Vv/Zbyk0Xx8PYsPrG8W3Z5Tj/nskdm2qJ5z1lwmbg7PyBvAVw3UDzvbd6HcFODZseO/jRLXKvRa5lQmElRqi+atFDsLcNMQHElV0BJNcZxBkHLOCPgR5VNIyCaayWHr68Yrd2FtqTfmFyC6NicbSKPZ0nNKyeFh/ftseI76jV8j3jOLcNd/vVyUSMjjUjakVx3C1MyrDM9AAM/OXdZXaXWKr1PeGYYVnRYMga89DgwgjWX9P8wyVKbbAgMBAAECggEATSx2KECqUT4wBKCidHBhmfifh5AdJalJNIqm86Zl2fj0nlUL5ttScvszLVUxapjWTxW4jlcSHcj3aSH4sFeuNqDTvGUUCSBeJK7OvNArNGtiVYeNplUCi73qzrEtgwucS37cGyG5rbNNXBx2gJusL9/lJxce0nWTVfksIwygKEKf8l3LyB3F5CX2bmmgGo0MOYrZXO6py1Vj3Fg4ESQaxotLlnAzq+rsjpbYD+PEXiROvazmghDLFMCssKyjXkREBbKxZ3ZTnE8/8pvuXP1W2C3mTldVTUU6EEJcSnbs1QnZvS5tXTSfwgUbb8Gyd6DgxBJMaIQdvivNUcmzjCQeoQKBgQDweZrLdLSTS2fOsOQmJ9tPNKj08FfuF1hGH6/wSq2WHVsFtJPMYY7sbM5s6GDKkkkAiNBePJdQlxzzrS0bond4jNy4KHkNISThfd9FvhVOMGXA/HcDlq2yl8mE8N+SOB+u8fFt2vlqEurOZsGf8FOJ3MeR8PX1hWcj+k/fkbgokwKBgQDWocZbKWFgoNfj49h43Egsfq4OFDd4oUxoqwpjI5H97Fv7ojn4m77qLfsovebDel9vOEeD2sK+VcD5eAEGYHChBOPf3E6zqj0amd3kXawEdJ2Cml0xahejZwDyfM/+RWM2YgD8YRF59bpiG4yImBQhk4+TVtME2Lr9PBL+wL1dmQKBgGmhwTFmDnw1P2A3q8Bm+ZsNUrplaPqZHpmPCcXPx/iM5JLZA6Nfp1yLXxHP8dSJ9a9aac07aGxqNLmFdK8S6s/1cG8kuCfgS0cR96W3Hby+3bOsMstMwPgWXNscw9iC9sfuV1MeQTkrHiGUWbFb7BY++RtOcXxsISZYqgVXCUIpAoGBALVNcoEPM3Ksa7HVhcaSTWVInT7HVRRRLHo+AUg9g9U7E3g8UTvwVBT9Qmvn/kah2Hvazo5S/K5LQfd5p2P7kyhxOQygzNp3s6YE06tUdTpOR79LJe3X8J/XIrWzOP9RHb2Si8KlPF4JdKfrHYtE67xxKZcMgLRXX50KYgFQTqYBAoGBAKNWDJy+Ag3776LQPsKQgqFao3MoYqBM/9OfpM6H/A1Em8h5VWo3L4M0JmpEYO08q5O9/pik95EeCP9V81lrjOknznhNIOKR7rR66lopIBtdPWnVGGHfuNQQDD4IWlwvM8p3hsLa+edqoNGYOBaODwBv5ZhHlMoEFobVfxwJagfw");
-        thirdParty.setNotifyUrl("https://pay.telebott.com/v3api/alipayNotify");
-        thirdParty.setCallbackUrl("https://pay.telebott.com/v3api/alipay");
-        thirdParty.setTypeId("de12ad07CsHdf1ekeu4965KrRb08ec9F89088fa05746ciI");
+        thirdParty.setTitle("典酱续微信");
+        thirdParty.setMchId("1631777389");
+//        thirdParty.setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoUL2dqWWaSNIU4XsGdOlzqXa1BiieE/q20CfcGAXwmNrfMXcE7odRWHBSpfyt2EkIl1iHBgvWuZL8t5+X7snvvTg7VL9il0iiYc6dJ7W1pbzfZzRraqVpAksIGHUjJgGMqmbOebUHuojDPqvyBtrflJhd7OHqQD/eNNA6HZgVj3j+3QaAcLJH/nPN7h5gANRyQH5+YERGnqqmW8k8azm6stJkSbXdeZKG9vRqKf6wb7DE1ZArqT0acHoXv8RB8egBtlmYzc9RxBNKC9hdtXZzc1ca8j82m4l69qfL9ykriAd8DwRNhUEk506GkhW2A1C/iYZo176Y32LcpmIi/6CRQIDAQAB");
+        thirdParty.setAppid("wx187b3a016239ba9f");
+        thirdParty.setSecretKey("192006250b4c09247ec02edce69f6a2d");
+        thirdParty.setNotifyUrl("https://pay.telebott.com/v3api/wxPayNotify");
+        thirdParty.setCallbackUrl("https://pay.telebott.com/v3api/callback?outTradeNo=");
+        thirdParty.setTypeId("a44c9e54ZB324b32yp4ddcIcq9ac4LMZaa3fd01f75e85j1");
         thirdParty.setRate(0.01);
         thirdParty.setQrcode(true);
 //        try{
