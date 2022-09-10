@@ -282,6 +282,26 @@ public class OrderDao {
         if(results.getMappedResults().isEmpty()) return 0D;
         return results.getMappedResults().get(0).getDouble("sum");
     }
+    public Double getOrderSumPid(String pid,long start, long end){
+        AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
+                match(Criteria.where("thirdPartyId").is(pid))
+                ,match(Criteria.where("state").is(1))
+                ,match(Criteria.where("addTime").gte(start).lte(end))
+                ,group().sum("money").as("sum")
+//                ,match(Criteria.where("uid").is(uid))
+//                project("count"),
+//                sort(Sort.Direction.DESC, "count"),
+//                match(Criteria.where("addTime").gte(start).lte(end)),
+//               match(Criteria.where("uid").is(uid))
+        ), "order", JSONObject.class);
+//        System.out.printf(results.getMappedResults().toString());
+//        List<ArticleResult> tagCount = results.getMappedResults();
+//        for (ArticleResult studentResult : tagCount) {
+//            System.out.println(studentResult.getName() + "\t" + studentResult.getCount());
+//        }
+        if(results.getMappedResults().isEmpty()) return 0D;
+        return results.getMappedResults().get(0).getDouble("sum");
+    }
     public Double getOrderSum(String uid,long start, long end){
         AggregationResults<JSONObject> results = mongoTemplate.aggregate(newAggregation(
                 match(Criteria.where("uid").is(uid))

@@ -35,6 +35,7 @@ public class ThirdParty {
     private int third = 0;
     private int state=0;
     private Double rate=0D;
+    private long limit=0L;
     private long addTime=0L;
     private long updateTime=0L;
 }
