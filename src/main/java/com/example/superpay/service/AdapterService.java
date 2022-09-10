@@ -72,6 +72,8 @@ public class AdapterService {
             return ToolsUtil.errorHtml("商户已达到未结算最大限额，请联系管理员!");
         }
         if (!ePay.isSign(user.getSecretKey())) {
+//            System.out.println(ePay);
+//            System.out.println(user.getSecretKey());
             return ToolsUtil.errorHtml("数据效验失败!");
         }
         Order order = orderRepository.findAllByOutTradeNo(ePay.getOut_trade_no());

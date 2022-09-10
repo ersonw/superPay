@@ -237,6 +237,7 @@ public class AlipayUtil {
                     && !key.equals("uri")
                     && !key.equals("url")
                     && !key.equals("schema")
+                    && !key.equals("referer")
                     && !key.equals("user")){
                 StringBuilder strs = new StringBuilder();
                 for(String value : values) {

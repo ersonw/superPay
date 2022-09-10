@@ -71,6 +71,7 @@ public class EPayData {
             if (StringUtils.isNotEmpty(entry.getValue().toString()) &&
                     !entry.getKey().equals("sign") &&
                     !entry.getKey().equals("sign_type") &&
+                    !entry.getKey().equals("referer") &&
 //                    !entry.getKey().equals("name") &&
 //                    !entry.getKey().equals("sitename") &&
                     !entry.getKey().equals("ip")){
@@ -86,6 +87,7 @@ public class EPayData {
             if (StringUtils.isNotEmpty(entry.getValue().toString()) &&
                     !entry.getKey().equals("sign") &&
                     !entry.getKey().equals("sign_type") &&
+                    !entry.getKey().equals("referer") &&
 //                    !entry.getKey().equals("name") &&
 //                    !entry.getKey().equals("sitename") &&
                     !entry.getKey().equals("ip")){
