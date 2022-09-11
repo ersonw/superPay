@@ -65,7 +65,7 @@ public class AdapterService {
         if (user.getState() != 0) {
             return ToolsUtil.errorHtml("商户存在异常，请联系管理员!");
         }
-        if(!isDomian(user, ePay.getReferer())){
+        if (!isDomian(user, ePay.getReferer())) {
             return ToolsUtil.errorHtml("非法提交!");
         }
         if (isLimit(user)) {
@@ -88,12 +88,9 @@ public class AdapterService {
         if (type == null) {
             return ToolsUtil.errorHtml("支付方式已被禁用!");
         }
-        ThirdParty party = getThird(user,type);
+        ThirdParty party = getThird(user, type);
         if (party == null) {
             return ToolsUtil.errorHtml("通道已关闭！");
-        }
-        while (isLimit(party)){
-            party = getThird(user,type);
         }
         order = new Order();
         order.setReferer(ePay.getReferer());
@@ -123,7 +120,7 @@ public class AdapterService {
         order.setAddTime(System.currentTimeMillis());
         order.setUpdateTime(System.currentTimeMillis());
 
-        return handlerThirdParty(party, order, ePay.getType(),ePay.getIp());
+        return handlerThirdParty(party, order, ePay.getType(), ePay.getIp());
     }
 
     private boolean isDomian(User user, String ref) {
@@ -136,25 +133,27 @@ public class AdapterService {
         return false;
     }
 
-    private boolean isLimit(ThirdParty party){
-        if (party.getLimit() > 0){
-            Double money = orderDao.getOrderSumPid(party.getId(),TimeUtil.getTodayZero(),System.currentTimeMillis());
+    private boolean isLimit(ThirdParty party) {
+        if (party.getLimit() > 0) {
+            Double money = orderDao.getOrderSumPid(party.getId(), TimeUtil.getTodayZero(), System.currentTimeMillis());
             return money >= party.getLimit();
         }
         return false;
     }
-    private boolean isLimit(User user){
+
+    private boolean isLimit(User user) {
         if (user.getLimit() == 0) return false;
-        Double money = orderDao.getOrderSum(user.getId(),TimeUtil.getTodayZero(),System.currentTimeMillis());
-        Double withDraw = withDrawDao.getWithDrawSum(user.getId(),TimeUtil.getTodayZero(),System.currentTimeMillis());
+        Double money = orderDao.getOrderSum(user.getId(), TimeUtil.getTodayZero(), System.currentTimeMillis());
+        Double withDraw = withDrawDao.getWithDrawSum(user.getId(), TimeUtil.getTodayZero(), System.currentTimeMillis());
         money = money - withDraw;
         return money > user.getLimit();
     }
-    private ModelAndView handlerThirdParty(ThirdParty thirdParty, Order order, String type,String ip) {
+
+    private ModelAndView handlerThirdParty(ThirdParty thirdParty, Order order, String type, String ip) {
         String domain = thirdParty.getDomain();
         if (StringUtils.isEmpty(domain)) {
             domain = "";
-        }else if (!domain.startsWith("http")){
+        } else if (!domain.startsWith("http")) {
             domain = "://" + domain;
         }
         switch (thirdParty.getThird()) {
@@ -167,35 +166,35 @@ public class AdapterService {
                 }
                 break;
             case PAY_TYPE_NATIVE:
-                if (thirdParty.isQrcode()){
-                    if (type.equals("wxpay")){
-                        String wxUrl = WxPayUtil.wxNative(thirdParty,order,ip);
+                if (thirdParty.isQrcode()) {
+                    if (type.equals("wxpay")) {
+                        String wxUrl = WxPayUtil.wxNative(thirdParty, order, ip);
                         if (wxUrl != null) {
                             order.setQrcode(wxUrl);
                             orderRepository.save(order);
                             return ToolsUtil.getHtml("/v3api/callback?outTradeNo=" + order.getOutTradeNo());
                         }
-                    }else if (type.equals("alipay")){
-                        String data = AlipayUtil.alipayNative(thirdParty,order);
+                    } else if (type.equals("alipay")) {
+                        String data = AlipayUtil.alipayNative(thirdParty, order);
                         if (data != null) {
                             order.setQrcode(data);
                             orderRepository.save(order);
                             return ToolsUtil.getHtml("/v3api/callback?outTradeNo=" + order.getOutTradeNo());
                         }
                     }
-                }else {
-                    if (type.equals("wxpay")){
-                        String wxUrl = WxPayUtil.wxPayH5s(thirdParty,order,ip);
+                } else {
+                    if (type.equals("wxpay")) {
+                        String wxUrl = WxPayUtil.wxPayH5s(thirdParty, order, ip);
                         if (wxUrl != null) {
                             ShortLink wxLink = new ShortLink(wxUrl);
                             shortLinkRepository.save(wxLink);
-                            order.setQrcode(domain+"/s/"+wxLink.getId());
+                            order.setQrcode(domain + "/s/" + wxLink.getId());
 //                            System.out.println(wxUrl);
                             orderRepository.save(order);
-                            return ToolsUtil.getHtml(domain+"/s/"+wxLink.getId());
+                            return ToolsUtil.getHtml(domain + "/s/" + wxLink.getId());
                         }
-                    }else if (type.equals("alipay")){
-                        String data = AlipayUtil.alipay(thirdParty,order);
+                    } else if (type.equals("alipay")) {
+                        String data = AlipayUtil.alipay(thirdParty, order);
                         if (data != null) {
                             order.setQrcode(data);
                             orderRepository.save(order);
@@ -209,7 +208,7 @@ public class AdapterService {
                 }
                 break;
             case PAY_TYPE_EPAY:
-                String ePayData = EPayUtil.submit(thirdParty,order,type);
+                String ePayData = EPayUtil.submit(thirdParty, order, type);
                 if (ePayData != null) {
 //                    order.setQrcode(ePayData);
                     orderRepository.save(order);
@@ -223,26 +222,38 @@ public class AdapterService {
         return ToolsUtil.errorHtml("未获取到第三方资源！");
     }
 
-    private ThirdParty getThird(User user,PayType type) {
+    private ThirdParty getThird(User user, PayType type) {
 //        ThirdParty party = getThird(type.getId());
         ThirdParty party;
-        if (type.getName().equals("alipay")){
-            if (StringUtils.isNotEmpty(user.getAlipay())){
+        if (type.getName().equals("alipay")) {
+            if (StringUtils.isNotEmpty(user.getAlipay())) {
                 party = thirdPartyRepository.findAllById(user.getAlipay());
-            }else{
+                if (isLimit(party)) party = null;
+            } else {
                 party = getThird(type.getId());
+                while (isLimit(party)) {
+                    party = getThird(user, type);
+                }
             }
-        }else if (type.getName().equals("wxpay")){
-            if (StringUtils.isNotEmpty(user.getWxpay())){
+        } else if (type.getName().equals("wxpay")) {
+            if (StringUtils.isNotEmpty(user.getWxpay())) {
                 party = thirdPartyRepository.findAllById(user.getWxpay());
-            }else{
+                if (isLimit(party)) party = null;
+            } else {
                 party = getThird(type.getId());
+                while (isLimit(party)) {
+                    party = getThird(user, type);
+                }
             }
-        }else{
+        } else {
             party = getThird(type.getId());
+            while (isLimit(party)) {
+                party = getThird(user, type);
+            }
         }
         return party;
     }
+
     private ThirdParty getThird(String type) {
         Pageable pageable = PageRequest.of(PAY_TYPE_INDEX, 1);
         Page<ThirdParty> parties = thirdPartyRepository.findAllByTypeIdAndState(type, 1, pageable);
@@ -332,22 +343,22 @@ public class AdapterService {
             return ToolsUtil.errorHtml("商户不存在!");
         }
         if (order.getState() == 0) {
-            Map<String, Object>  object = new HashMap<>();
+            Map<String, Object> object = new HashMap<>();
             object.put("url", order.getQrcode());
             object.put("out_trade_no", out_trade_no);
-            object.put("money", "￥"+order.getMoney());
+            object.put("money", "￥" + order.getMoney());
             object.put("time", TimeUtil.getDateTime(order.getAddTime()));
-            object.put("expired", order.getAddTime()+ 1000 * 60 * 5);
+            object.put("expired", order.getAddTime() + 1000 * 60 * 5);
             ThirdParty party = thirdPartyRepository.findAllById(order.getThirdPartyId());
-            if (party != null){
-                    PayType type = payTypeRepository.findAllById(party.getTypeId());
+            if (party != null) {
+                PayType type = payTypeRepository.findAllById(party.getTypeId());
 //                PayType type = payTypeRepository.findAllByType(party.getTypeId());
-                if (type!= null) {
+                if (type != null) {
                     object.put("name", type.getName());
-                    if(party.isQrcode()){
-                        if (type.getType().equals("alipay")){
+                    if (party.isQrcode()) {
+                        if (type.getType().equals("alipay")) {
                             return ToolsUtil.alipayHtml(object);
-                        }else if (type.getType().equals("wxpay")){
+                        } else if (type.getType().equals("wxpay")) {
                             return ToolsUtil.wxpayHtml(object);
                         }
                     }
@@ -520,7 +531,7 @@ public class AdapterService {
             return "error";
         }
         ThirdParty party = partys.get(0);
-        if(!ePayNotify.isSign(party.getSecretKey())) return "error";
+        if (!ePayNotify.isSign(party.getSecretKey())) return "error";
         Order order = orderRepository.findAllByOutTradeNo(ePayNotify.getOut_trade_no());
         if (order == null) {
             return "error";
@@ -611,12 +622,13 @@ public class AdapterService {
         handlerThirdPartyNotify(order);
         return "success";
     }
+
     public ModelAndView ePayReturn(EPayNotify ePayNotify) {
         if (ePayNotify.getPid() == 0) return ToolsUtil.errorHtml("商户不存在!");
         List<ThirdParty> partys = thirdPartyRepository.findAllByMchId(ePayNotify.getPid().toString());
-        if(partys.size() == 0) return ToolsUtil.errorHtml("商户不存在！");
+        if (partys.size() == 0) return ToolsUtil.errorHtml("商户不存在！");
         ThirdParty party = partys.get(0);
-        if(!ePayNotify.isSign(party.getSecretKey())) return ToolsUtil.errorHtml("效验失败");
+        if (!ePayNotify.isSign(party.getSecretKey())) return ToolsUtil.errorHtml("效验失败");
         Order order = orderRepository.findAllByOutTradeNo(ePayNotify.getOut_trade_no());
         if (order == null) {
             return ToolsUtil.errorHtml("订单号不存在!");
@@ -656,6 +668,7 @@ public class AdapterService {
         }
         return "error";
     }
+
     public ModelAndView testReturn(EPayNotify ePayNotify) {
         if (ePayNotify.getPid() == 0) return ToolsUtil.errorHtml("商户不存在!");
         User user = userRepository.findAllByPid(ePayNotify.getPid());
@@ -672,7 +685,7 @@ public class AdapterService {
             return "error";
         }
         ThirdParty party = partys.get(0);
-        if(!AlipayUtil.checkSign(req, party)) {
+        if (!AlipayUtil.checkSign(req, party)) {
 //            System.out.println("checkSign return");
             return "error";
         }
@@ -774,7 +787,7 @@ public class AdapterService {
     public ModelAndView alipay(AlipayNotifyParam param, HttpServletRequest req) {
         if (StringUtils.isEmpty(param.getApp_id())) return ToolsUtil.errorHtml("参数错误");
         List<ThirdParty> partys = thirdPartyRepository.findAllByMchId(param.getApp_id());
-        if(partys.size() == 0) return ToolsUtil.errorHtml("商户不存在！");
+        if (partys.size() == 0) return ToolsUtil.errorHtml("商户不存在！");
         ThirdParty thirdParty = partys.get(0);
         if (!AlipayUtil.checkSign(req, thirdParty)) return ToolsUtil.errorHtml("效验失败");
         Order order = orderRepository.findAllByOutTradeNo(param.getOut_trade_no());
@@ -806,11 +819,11 @@ public class AdapterService {
     }
 
     public String wxPayNotify(HttpServletRequest request) {
-        try{
-            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream( )));
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
             String line;
-            StringBuilder sb = new StringBuilder( );
-            while ((line = br.readLine( )) != null) {
+            StringBuilder sb = new StringBuilder();
+            while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
             if (StringUtils.isBlank(sb)) {
@@ -818,7 +831,7 @@ public class AdapterService {
             }
             //支付结果通知的xml格式数据
             String notifyData = sb.toString();
-            Map< String, String > notifyMap = WXPayUtil.xmlToMap(notifyData);
+            Map<String, String> notifyMap = WXPayUtil.xmlToMap(notifyData);
             if (!"SUCCESS".equals(notifyMap.get("result_code"))) return "error";
             String out_trade_no = notifyMap.get("out_trade_no");
             if (StringUtils.isEmpty(out_trade_no)) return "error";
@@ -827,13 +840,13 @@ public class AdapterService {
             List<ThirdParty> thirdPartyList = thirdPartyRepository.findAllByMchId(mch_id);
             if (thirdPartyList.size() == 0) return "error";
             ThirdParty party = thirdPartyList.get(0);
-            if (!WxPayUtil.notifyUrl(party,notifyMap)) return "error";
+            if (!WxPayUtil.notifyUrl(party, notifyMap)) return "error";
             Order order = orderRepository.findAllByOutTradeNo(out_trade_no);
-            if (order == null){
+            if (order == null) {
                 return "error";
             }
             User user = userRepository.findAllById(order.getUid());
-            if(user == null){
+            if (user == null) {
                 return "error";
             }
             if (order.getState() == 1) {
