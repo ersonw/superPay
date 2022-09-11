@@ -232,7 +232,7 @@ public class AdapterService {
             } else {
                 party = getThird(type.getId());
                 while (isLimit(party)) {
-                    party = getThird(user, type);
+                    party = getThird(type.getId());
                 }
             }
         } else if (type.getName().equals("wxpay")) {
@@ -242,13 +242,13 @@ public class AdapterService {
             } else {
                 party = getThird(type.getId());
                 while (isLimit(party)) {
-                    party = getThird(user, type);
+                    party = getThird(type.getId());
                 }
             }
         } else {
             party = getThird(type.getId());
             while (isLimit(party)) {
-                party = getThird(user, type);
+                party = getThird(type.getId());
             }
         }
         return party;
