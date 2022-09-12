@@ -277,10 +277,10 @@ public class AdapterService {
         thirdParty.setThird(PAY_TYPE_NATIVE);
         thirdParty.setAddTime(System.currentTimeMillis());
         thirdParty.setState(1);
-        thirdParty.setTitle("典酱续微信");
-        thirdParty.setMchId("1631777389");
+        thirdParty.setTitle("金通微信");
+        thirdParty.setMchId("1631697071");
 //        thirdParty.setPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoUL2dqWWaSNIU4XsGdOlzqXa1BiieE/q20CfcGAXwmNrfMXcE7odRWHBSpfyt2EkIl1iHBgvWuZL8t5+X7snvvTg7VL9il0iiYc6dJ7W1pbzfZzRraqVpAksIGHUjJgGMqmbOebUHuojDPqvyBtrflJhd7OHqQD/eNNA6HZgVj3j+3QaAcLJH/nPN7h5gANRyQH5+YERGnqqmW8k8azm6stJkSbXdeZKG9vRqKf6wb7DE1ZArqT0acHoXv8RB8egBtlmYzc9RxBNKC9hdtXZzc1ca8j82m4l69qfL9ykriAd8DwRNhUEk506GkhW2A1C/iYZo176Y32LcpmIi/6CRQIDAQAB");
-        thirdParty.setAppid("wx187b3a016239ba9f");
+        thirdParty.setAppid("wx2a834136550c024a");
         thirdParty.setSecretKey("192006250b4c09247ec02edce69f6a2d");
         thirdParty.setNotifyUrl("https://pay.telebott.com/v3api/wxPayNotify");
         thirdParty.setCallbackUrl("https://pay.telebott.com/v3api/callback?outTradeNo=");
