@@ -25,6 +25,9 @@ spring:
       authentication-database: admin
 logging:
   level:
+    sdk:
+      biz:
+        info: OFF
     com:
       alipay:
         api: OFF

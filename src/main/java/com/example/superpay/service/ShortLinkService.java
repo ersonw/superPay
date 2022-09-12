@@ -68,7 +68,8 @@ public class ShortLinkService {
             return ToolsUtil.postHtml(url, new JSONObject());
 //            return ToolsUtil.getHtml(link.getLink());
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+//            log.error(e.getMessage(), e);
+            e.printStackTrace();
             return ToolsUtil.errorHtml(e.getMessage());
         }
     }
