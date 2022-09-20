@@ -31,7 +31,7 @@ public class WxPayUtil {
         WxPayService wxPayService = new WxPayServiceImpl();
         wxPayService.setConfig(payConfig);
         WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
-        wxPayUnifiedOrderRequest.setBody(order.getOutTradeNo());
+        wxPayUnifiedOrderRequest.setBody("聚合码收款");
         wxPayUnifiedOrderRequest.setProductId(order.getOutTradeNo());
         wxPayUnifiedOrderRequest.setOutTradeNo(order.getOutTradeNo());
         wxPayUnifiedOrderRequest.setTotalFee(new Double(order.getMoney() * 100).intValue());
@@ -59,7 +59,7 @@ public class WxPayUtil {
             maps.put("total_fee", String.valueOf(new Double(order.getMoney() * 100).longValue()));
             maps.put("trade_type", "MWEB");
             maps.put("notify_url", thirdParty.getNotifyUrl());
-            maps.put("body", order.getOutTradeNo());
+            maps.put("body", "聚合支付收款："+order.getOutTradeNo());
             maps.put("time_expire",TimeUtil.getWxTimeExpire(System.currentTimeMillis() + 1000 * 60 * 5));
             WXPay wxPay = new WXPay( new WXConfigUtil(thirdParty.getAppid(),thirdParty.getMchId(),thirdParty.getSecretKey(),thirdParty.getPublicKey()));
             Map< String, String > reqData = wxPay.fillRequestData(maps);

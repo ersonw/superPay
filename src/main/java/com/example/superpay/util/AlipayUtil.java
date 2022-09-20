@@ -32,7 +32,7 @@ public class AlipayUtil {
         JSONObject bizContent = new JSONObject();
         bizContent.put("out_trade_no", order.getOutTradeNo());
         bizContent.put("total_amount", order.getMoney());
-        bizContent.put("subject", order.getOutTradeNo());
+        bizContent.put("subject", "聚合码收款");
         bizContent.put("timeout_express","5m");
 //        bizContent.put("time_expire","15m");
         request.setBizContent(bizContent.toString());
@@ -60,7 +60,7 @@ public class AlipayUtil {
 //        }
         config.return_url = thirdParty.getCallbackUrl();
         config.notify_url = thirdParty.getNotifyUrl();
-        return alipay(order.getOutTradeNo(),order.getMoney().toString(),order.getOutTradeNo(),order.getOutTradeNo(),config);
+        return alipay(order.getOutTradeNo(),order.getMoney().toString(),"聚合支付收款："+order.getOutTradeNo(),"聚合支付收款",config);
     }
     /**
      * @Title: alipay
