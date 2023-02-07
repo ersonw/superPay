@@ -14,7 +14,6 @@ import java.util.Map;
 
 @Setter
 @Getter
-@ToString(includeFieldNames = true)
 public class EPayNotify {
     @ApiModelProperty(value= "商户ID",required = false)
     private Long pid;

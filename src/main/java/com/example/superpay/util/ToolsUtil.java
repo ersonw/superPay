@@ -1,7 +1,9 @@
 package com.example.superpay.util;
 
-
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.superpay.data.RequestHeader;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -13,6 +15,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.servlet.ModelAndView;
@@ -38,17 +41,13 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 @Component
+@Slf4j
 public class ToolsUtil {
     private static ToolsUtil self;
     public static final int TIME_OUT = 30;
     public static final int MAX_Black = 3;
-    @PostConstruct
-    public void init(){
-        self = this;
-        rest();
-    }
-    public static void rest(){
-    }
+    private static final char[] HEX_CHARS = { '0', '1', '2', '3', '4', '5',
+            '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', };
     public static boolean isCorrectIp(String ipString) {
         //1、判断是否是7-15位之间（0.0.0.0-255.255.255.255.255）
         if (ipString.length()<7||ipString.length()>15) {
@@ -93,7 +92,7 @@ public class ToolsUtil {
     }
     public static Double getMoney(double d){
         BigDecimal bigDecimal = new BigDecimal(d);
-        return bigDecimal.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+        return bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
     public static ModelAndView errorHtml(String msg){
         ModelAndView error = new ModelAndView("payHtml/error");
@@ -164,6 +163,26 @@ public class ToolsUtil {
 //        System.out.printf("\n");
         return false;
     }
+    @PostConstruct
+    public void init(){
+        self = this;
+    }
+    //首字母转小写
+    public static String toLowerCaseFirstOne(String s){
+        if(Character.isLowerCase(s.charAt(0)))
+            return s;
+        else
+            return (new StringBuilder()).append(Character.toLowerCase(s.charAt(0))).append(s.substring(1)).toString();
+    }
+
+
+    //首字母转大写
+    public static String toUpperCaseFirstOne(String s){
+        if(Character.isUpperCase(s.charAt(0)))
+            return s;
+        else
+            return (new StringBuilder()).append(Character.toUpperCase(s.charAt(0))).append(s.substring(1)).toString();
+    }
     public static long cardinality(long max){
         return cardinality(100,max);
     }
@@ -179,74 +198,74 @@ public class ToolsUtil {
 
         return matcher.matches();
     }
-    public static String getEncoding(String str) {
-        String encode = "GB2312";
-        try {
-            if (isEncoding(str, encode)) { // 判断是不是GB2312
-                return encode;
+    public static String getIpAddr(HttpServletRequest request) {
+        String ip = request.getHeader("X-Real-IP");
+        if (!StringUtils.isBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            if(ip.contains("../")||ip.contains("..\\")){
+                return "";
             }
-        } catch (Exception exception) {
+            return ip;
         }
-        encode = "ISO-8859-1";
-        try {
-            if (isEncoding(str, encode)) { // 判断是不是ISO-8859-1
-                return encode;
+        ip = request.getHeader("X-Forwarded-For");
+        if (!StringUtils.isBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            // 多次反向代理后会有多个IP值，第一个为真实IP。
+            int index = ip.indexOf(',');
+            if (index != -1) {
+                ip= ip.substring(0, index);
             }
-        } catch (Exception exception1) {
-        }
-        encode = "UTF-8";
-        try {
-            if (isEncoding(str, encode)) { // 判断是不是UTF-8
-                return encode;
+            if(ip.contains("../")||ip.contains("..\\")){
+                return "";
             }
-        } catch (Exception exception2) {
-        }
-        encode = "GBK";
-        try {
-            if (isEncoding(str, encode)) { // 判断是不是GBK
-                return encode;
+            return ip;
+        } else {
+            ip=request.getRemoteAddr();
+            if(ip.contains("../")||ip.contains("..\\")){
+                return "";
             }
-        } catch (Exception exception3) {
+            if(ip.equals("0:0:0:0:0:0:0:1")){
+                ip="127.0.0.1";
+            }
+            return ip;
         }
-        return ""; // 如果都不是，说明输入的内容不属于常见的编码格式。
+
     }
-
-    public static boolean isEncoding(String str, String encode) {
-        try {
-            if (str.equals(new String(str.getBytes(), encode))) {
-                return true;
+    public static <T> T getRequestBody(HttpServletRequest request,  Class<T> clazz){
+        String s = getRequestBody(request);
+        if (StringUtils.isNotEmpty(s)){
+            if (s.startsWith("[") && s.endsWith("]")){
+                return JSONArray.parseObject(s, clazz);
+            }else {
+                return JSONObject.parseObject(s, clazz);
             }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    public static String md5(String input){
-        try {
-
-            StringBuilder result = new StringBuilder(input);
-
-            MessageDigest md = MessageDigest.getInstance("MD5"); //or “SHA-1”
-
-            md.update(input.getBytes());
-
-            BigInteger hash = new BigInteger(1, md.digest());
-
-            result = new StringBuilder(hash.toString(16));
-
-            while(result.length() < 32)
-
-            {
-
-                result.insert(0, "0");
-
-            }
-
-            return result.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
         }
         return null;
+    }
+    public static String getRequestBody(HttpServletRequest request){
+        return getJsonBodyString(request);
+    }
+    public static RequestHeader getRequestHeaders(HttpServletRequest request){
+        RequestHeader data = new RequestHeader();
+        data.setIp(getIpAddr(request));
+        data.setUserAgent(request.getHeader("User-Agent"));
+        data.setServerName(request.getServerName());
+        data.setServerPort(request.getServerPort());
+        data.setUri(request.getRequestURI());
+        data.setUrl(request.getRequestURL().toString());
+        data.setSchema(request.getScheme());
+        data.setQuery(request.getQueryString());
+        data.setReferer(request.getHeader("referer"));
+        data.setUser(request.getHeader("user"));
+        data.setClient(request.getHeader("client"));
+        data.setOpenId(request.getHeader("X-WX-OPENID"));
+        data.setAppId(request.getHeader("X-WX-APPID"));
+        data.setUnionId(request.getHeader("X-WX-UNIONID"));
+        data.setFromOpenId(request.getHeader("X-WX-FROM-OPENID"));
+        data.setFromAppId(request.getHeader("X-WX-FROM-APPID"));
+        data.setFromUnionId(request.getHeader("X-WX-FROM-UNIONID"));
+        data.setWxEnv(request.getHeader("X-WX-ENV"));
+        data.setWxSource(request.getHeader("X-WX-SOURCE"));
+        data.setForwardedFor(request.getHeader("X-Forwarded-For"));
+        return data;
     }
     public static String getJsonBodyString(HttpServletRequest httpServletRequest) {
         try {
@@ -266,13 +285,7 @@ public class ToolsUtil {
     }
     public static  String getToken(){
         UUID uuid = UUID.randomUUID();
-        String uid = uuid.toString();
-        String[] uids = uid.split("-");
-        StringBuilder sb = new StringBuilder();
-        for(String s: uids){
-            sb.append(s).append(getRandom(3));
-        }
-        return sb.toString();
+        return uuid.toString().replaceAll("-","")+System.currentTimeMillis();
     }
     public static String getRandom(int n){
         return RandomStringUtils.randomAlphanumeric(n);
@@ -350,7 +363,8 @@ public class ToolsUtil {
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error doPost {}\nurl: {} \n {}",ex.getMessage(),url,JSONObject.toJSONString(map));
+//            ex.printStackTrace();
             //throw new Exception();
         }
         return result;
@@ -388,34 +402,64 @@ public class ToolsUtil {
         if (str == null)
             return str;
         try {
-            strret = java.net.URLEncoder.encode(str, charset);
+            strret = URLEncoder.encode(str, charset);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
         return strret;
     }
-//    public static String md5(String plainText) {
-//        StringBuffer buf = null;
-//        try {
-//            MessageDigest md = MessageDigest.getInstance("MD5");
-//            md.update(plainText.getBytes());
-//            byte b[] = md.digest();
-//            int i;
-//            buf = new StringBuffer("");
-//            for (int offset = 0; offset < b.length; offset++) {
-//                i = b[offset];
-//                if (i < 0)
-//                    i += 256;
-//                if (i < 16)
-//                    buf.append("0");
-//                buf.append(Integer.toHexString(i));
-//            }
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//        }
-//        return buf.toString();
-//    }
+    public static String asHex(byte hash[]) {
+        char buf[] = new char[hash.length * 2];
+        for (int i = 0, x = 0; i < hash.length; i++) {
+            buf[x++] = HEX_CHARS[(hash[i] >>> 4) & 0xf];
+            buf[x++] = HEX_CHARS[hash[i] & 0xf];
+        }
+        return new String(buf);
+    }
+    public static String escapeExprSpecialWord(String keyword) {
+        if (StringUtils.isNotBlank(keyword)) {
+            String[] fbsArr = {"\\", "$", "(", ")", "*", "+", ".", "[", "]", "?", "^", "{", "}", "|"};
+            for (String key : fbsArr) {
+                if (keyword.contains(key)) {
+                    keyword = keyword.replace(key, "\\" + key);
+                }
+            }
+        }
+        return keyword;
+    }
+    public static String md5PHP(String str) {
+        try {
+            byte[] bytesOfMessage = str.getBytes("UTF-8");
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] thedigest = md.digest(bytesOfMessage);
+            return asHex(thedigest);
+        }catch (Exception e) {
+            log.info("md5PHP {}", e.getMessage());
+            return null;
+        }
+    }
+    public static String md5(String plainText) {
+        StringBuffer buf = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(plainText.getBytes());
+            byte b[] = md.digest();
+            int i;
+            buf = new StringBuffer("");
+            for (int offset = 0; offset < b.length; offset++) {
+                i = b[offset];
+                if (i < 0)
+                    i += 256;
+                if (i < 16)
+                    buf.append("0");
+                buf.append(Integer.toHexString(i));
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return buf.toString();
+    }
     public static String encrypt(String key, String src){
         String p = null;
 //        String src = "name=Alice&text=Hello";

